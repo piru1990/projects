@@ -1,0 +1,5 @@
+mcp[cli]>=1.2.0,<2
+# Indirect pin copied from safari-mcp: cryptography 49+ publishes no wheel for Intel macOS 13,
+# so pip would fall back to a source build that needs Rust. 48.x ships a universal2 wheel.
+cryptography>=3.4,<49
+pytest>=8

@@ -1,0 +1,14 @@
+[project]
+name = "linkedin-mcp"
+version = "0.1.0"
+description = "MCP server to apply to LinkedIn jobs (Easy Apply) through the user's own Safari session"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=1.2.0,<2",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.scripts]
+linkedin-mcp = "server:mcp.run"
