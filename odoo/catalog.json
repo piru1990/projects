@@ -1,0 +1,14 @@
+{
+  "_nota": "Catálogo de producto terminado. Los sku coinciden con los id de PRODUCTS en gatheringsgt/assets/shared.js. Materias primas y costos: pendientes (Excel de Andrea).",
+  "productos": [
+    {"sku": "GT-SINGLE",    "nombre": "The Single",    "precio": 50},
+    {"sku": "GT-COZY",      "nombre": "The Cozy",      "precio": 250},
+    {"sku": "GT-HOMESTYLE", "nombre": "The Homestyle", "precio": 450},
+    {"sku": "GT-GATHERING", "nombre": "The Gathering", "precio": 700},
+    {"sku": "GT-TAILORED",  "nombre": "The Tailored",  "precio": 0}
+  ],
+  "servicios": [
+    {"sku": "GT-ENVIO", "nombre": "Envío a domicilio"}
+  ],
+  "historico": {"sku": "GT-OTROS", "nombre": "Otros productos (histórico)"}
+}

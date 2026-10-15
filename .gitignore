@@ -169,3 +169,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Odoo
+odoo/.env
+odoo/backups/
+odoo/data/
+*.xlsx

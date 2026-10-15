@@ -1,0 +1,50 @@
+# Odoo 18 Community + PostgreSQL + Cloudflare Tunnel para la Mac mini.
+# Uso: cp .env.example .env (completar) && ./scripts/init-db.sh && docker compose up -d
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD en .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 10s
+      retries: 6
+
+  odoo:
+    image: odoo:18.0
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: ${POSTGRES_PASSWORD}
+    # --proxy-mode: Odoo está detrás del túnel (HTTPS lo termina Cloudflare).
+    # --db-filter y --no-database-list: una sola base («gatherings») y sin selector de bases.
+    command: >
+      odoo --proxy-mode --db-filter=^${ODOO_DB:-gatherings}$$ --no-database-list
+      --admin-passwd=${ODOO_ADMIN_PASSWD:?define ODOO_ADMIN_PASSWD en .env}
+    ports:
+      - "127.0.0.1:8069:8069"   # solo local; el acceso externo va por el túnel
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    depends_on: [odoo]
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?define CLOUDFLARE_TUNNEL_TOKEN en .env}
+    profiles: ["tunnel"]   # docker compose --profile tunnel up -d
+
+volumes:
+  db-data:
+  odoo-data:
