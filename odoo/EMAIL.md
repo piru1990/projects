@@ -10,7 +10,7 @@ dominio ya están en Cloudflare y no se tocan.
 3. Poner la contraseña de 16 caracteres en el `.env` de la Mac mini (no se sube al repo):
 
 ```
-MAIL_APP_PASSWORD=abcd efgh ijkl mnop
+MAIL_APP_PASSWORD="abcd efgh ijkl mnop"   # entre comillas: el .env se carga con `source`
 ODOO_ADMIN_PASSWORD=...        # usuario admin de Odoo
 # opcionales: MAIL_USER=hola@gatheringsgt.com  ODOO_DB=gatherings  ODOO_ADMIN_LOGIN=admin  ODOO_URL=http://127.0.0.1:8069
 ```
