@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es" data-root="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gatherings GT · Tablas de charcutería y grazing tables</title>
+<meta name="description" content="Tablas de charcutería artesanales y grazing tables para eventos, reuniones y momentos especiales en Guatemala. Pedí por WhatsApp.">
+<meta property="og:title" content="Gatherings GT">
+<meta property="og:description" content="Artisan Charcuterie Boards & Grazing Tables en Guatemala. Pedí por WhatsApp.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b1f6b">
+<script>
+/* Móvil (/m/): en pantalla ancha sin teléfono manda a / salvo que la persona haya elegido la versión móvil (?v=m). */
+(function(){try{var q=new URLSearchParams(location.search),v=q.get("v");if(v){localStorage.setItem("gt_view",v);}else{v=localStorage.getItem("gt_view");}
+if(v!=="m"&&(v==="d"||(!v&&!/Android|iPhone|iPod|Mobile/i.test(navigator.userAgent)&&innerWidth>768)))location.replace("../"+location.search.replace(/[?&]v=[^&]*/,"").replace(/^&/,"?")+location.hash)}catch(e){}})();
+</script>
+<style>
+:root{--navy:#0b1f6b;--cream:#f1f7f2;--ink:#1c1c28;--mut:#6b6b7a;--line:#d5e5d9;--wa:#1fa855}
+*{box-sizing:border-box}
+body{margin:0 0 72px;font:16px/1.5 Georgia,serif;color:var(--ink);background:var(--cream)}
+h1,h2,h3{font-weight:400;margin:0;letter-spacing:.02em}
+a{color:inherit}
+.top{background:var(--navy);color:#fff;text-align:center;padding:22px 16px 20px}
+.top h1{font-size:28px;letter-spacing:.14em;text-transform:uppercase}
+.top small{display:block;font:11px system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;opacity:.75;margin-top:4px}
+.btn{display:inline-block;border:0;border-radius:999px;padding:12px 22px;font:600 15px system-ui,sans-serif;text-decoration:none;cursor:pointer}
+.btn-wa{background:var(--wa);color:#fff}
+main{padding:20px 16px}
+h2{font-size:22px;color:var(--navy);margin-bottom:4px}
+.sub,.note{font:13px system-ui,sans-serif;color:var(--mut);margin:0 0 14px}
+.card{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.card.hl{outline:3px solid var(--navy)}
+.card img,.ph{width:96px;flex:none;object-fit:cover}
+.ph{background:#dcebe0;color:#7fa38a;font:10px system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px}
+.b{padding:10px 12px;display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.card h3{font-size:17px;color:var(--navy)}
+.card p{margin:0;color:var(--mut);font-size:13px;line-height:1.35}
+.price{font:600 14px system-ui,sans-serif}
+.qty{display:flex;align-items:center;gap:10px;margin-top:4px}
+.qty button{width:38px;height:38px;border-radius:50%;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:20px}
+.qty span{min-width:18px;text-align:center;font:600 16px system-ui,sans-serif}
+.qty .lnk{width:auto;height:auto;border:0;border-radius:0;background:none;font:12px system-ui,sans-serif;color:var(--mut);text-decoration:underline;margin-left:auto}
+form{display:grid;gap:10px}
+label{font:600 13px system-ui,sans-serif;color:var(--navy);display:grid;gap:4px}
+input,select,textarea{font:16px system-ui,sans-serif;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%}
+.save{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 14px}
+.save button{background:none;border:0;font:13px system-ui,sans-serif;color:var(--navy);text-decoration:underline;padding:6px 0}
+ol{margin:0 0 20px;padding-left:20px;font:14px system-ui,sans-serif;color:var(--mut)}
+footer{text-align:center;padding:20px 16px;font:13px system-ui,sans-serif;color:var(--mut)}
+.cart{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+.cart.on{display:flex}.cart b{font:600 15px system-ui,sans-serif}
+.fab{position:fixed;right:12px;bottom:12px}.cart.on~.fab{display:none}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:999px;font:13px system-ui,sans-serif;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+.toast.on{opacity:1}</style>
+</head>
+<body>
+<div class="top" id="top"><h1>Gatherings</h1><small>Artisan Charcuterie Boards &amp; Grazing Tables</small></div>
+<main>
+  <h2>El menú</h2>
+  <p class="sub">Tablas con quesos y jamones premium. Armá tu pedido y mandalo por WhatsApp.</p>
+  <div id="grid"></div>
+  <p class="note">Envío: Q35 – Q45, no incluido en el precio.</p>
+  <ol><li>Elegí tus tablas.</li><li>Completá fecha y dirección.</li><li>Enviá por WhatsApp; te confirmamos total y horario.</li></ol>
+  <section id="pedido">
+    <h2>Tu pedido</h2><p class="sub" id="sum"></p>
+    <div class="save" id="saveBox" hidden><button type="button" id="saveLink">Guardar y terminar después (copiar link)</button><button type="button" id="clearCart">Vaciar</button></div>
+    <form id="f">
+      <label>Nombre<input name="nombre" required autocomplete="name"></label>
+      <label>Fecha del evento o entrega<input name="fecha" type="date" required></label>
+      <label>Hora aproximada<input name="hora" type="time"></label>
+      <label>Tipo de entrega<select name="entrega"><option>Entrega a domicilio</option></select></label>
+      <label>Zona y dirección<textarea name="dir" rows="2" placeholder="Zona, colonia, referencias"></textarea></label>
+      <label>Notas (alergias, personas, ocasión)<textarea name="notas" rows="2"></textarea></label>
+      <button class="btn btn-wa" type="submit">Enviar pedido por WhatsApp</button>
+      <p class="note">No se cobra nada en la página. Tu pedido queda guardado en este teléfono.</p>
+    </form>
+  </section>
+</main>
+<footer><a id="waFoot" href="#">+502 5541 2293</a> · <a href="https://www.instagram.com/gatheringsgt/" rel="noopener">@gatheringsgt</a><br><a href="../?v=d">Ver versión de escritorio</a></footer>
+<div class="cart" id="cart"><b id="cartTxt"></b><a class="btn btn-wa" href="#pedido">Finalizar pedido</a></div>
+<a class="btn btn-wa fab" id="fab" href="#">WhatsApp</a>
+<div class="toast" id="toast" role="status"></div>
+<script src="../assets/shared.js"></script>
+</body>
+</html>
