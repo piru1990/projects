@@ -1,0 +1,21 @@
+{
+    "name": "Gatherings WhatsApp (WhatsApp Web)",
+    "version": "18.0.1.0.0",
+    "summary": "Abre WhatsApp Web con el mensaje listo desde clientes y pedidos",
+    "description": "Botón de WhatsApp en clientes y pedidos que abre WhatsApp Web (enlace wa.me) con un mensaje prellenado desde plantillas y lo deja registrado en el chatter. No usa la API de WhatsApp.",
+    "author": "Gatherings GT",
+    "license": "LGPL-3",
+    "category": "Sales",
+    "depends": ["base", "mail", "contacts", "sale_management"],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/wa_template_data.xml",
+        "views/wa_template_views.xml",
+        "views/res_partner_views.xml",
+        "views/sale_order_views.xml",
+        "views/res_company_views.xml",
+        "wizard/wa_compose_views.xml",
+    ],
+    "installable": True,
+    "application": False,
+}

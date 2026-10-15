@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="wa_template_order_confirmed" model="gt.wa.template">
+        <field name="name">Pedido confirmado</field>
+        <field name="model">sale.order</field>
+        <field name="sequence">10</field>
+        <field name="body">Hola {nombre}, gracias por tu pedido {pedido} en {tienda}. El total es {total}. Cualquier duda, escribinos por este medio.</field>
+    </record>
+    <record id="wa_template_order_ready" model="gt.wa.template">
+        <field name="name">Pedido listo para entrega</field>
+        <field name="model">sale.order</field>
+        <field name="sequence">20</field>
+        <field name="body">Hola {nombre}, tu pedido {pedido} está listo. Fecha de entrega: {entrega}. ¿Nos confirmás la dirección y el horario? Gracias, {tienda}.</field>
+    </record>
+    <record id="wa_template_order_reminder" model="gt.wa.template">
+        <field name="name">Recordatorio de pago</field>
+        <field name="model">sale.order</field>
+        <field name="sequence">30</field>
+        <field name="body">Hola {nombre}, te recordamos que el pedido {pedido} por {total} está pendiente de pago. Gracias, {tienda}.</field>
+    </record>
+    <record id="wa_template_partner_hello" model="gt.wa.template">
+        <field name="name">Saludo a cliente</field>
+        <field name="model">res.partner</field>
+        <field name="sequence">10</field>
+        <field name="body">Hola {nombre}, te saludamos de {tienda}. ¿En qué te podemos ayudar?</field>
+    </record>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Datos de WhatsApp en la ficha de la compañía (Ajustes > Compañías). -->
+    <record id="res_company_view_form_whatsapp" model="ir.ui.view">
+        <field name="name">res.company.form.whatsapp</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="WhatsApp" name="whatsapp">
+                    <group>
+                        <field name="wa_business_number"/>
+                        <field name="wa_country_code"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
