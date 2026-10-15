@@ -4,9 +4,12 @@
   python3 import_sales.py check  RUTA.xlsx            # solo lee y reporta (no toca Odoo)
   python3 import_sales.py load   RUTA.xlsx            # simula (dry-run) contra Odoo
   python3 import_sales.py load   RUTA.xlsx --apply    # crea catálogo, clientes y pedidos
+  python3 import_sales.py load   RUTA.xlsx --apply --refresh   # además reescribe líneas e IVA de pedidos ya cargados
 
 Conexión por variables de entorno: ODOO_URL, ODOO_DB, ODOO_USER, ODOO_PASSWORD.
-Es idempotente: pedidos (GT-0001...), productos (default_code) y clientes (nombre exacto) que ya existen se omiten.
+Es idempotente: pedidos (GT-0001...), productos (default_code) y clientes (nombre exacto) que ya existen se omiten
+(con --refresh, los pedidos existentes se reescriben: líneas, producto, impuesto y nota).
+Los precios del negocio incluyen IVA (12 %): las líneas llevan el impuesto «IVA 12% (incluido)», así el TOTAL no cambia.
 Los pedidos históricos se crean ya confirmados (state=sale) sin pasar por action_confirm, así que no generan
 entregas ni mueven inventario; el cobro y la entrega quedan en la nota del pedido.
 """
@@ -18,7 +21,7 @@ import os
 import sys
 from pathlib import Path
 
-from normalize import Pedido, clave_cliente, leer_pedidos, resumen
+from normalize import Pedido, clave_cliente, leer_pedidos, producto_exacto, resumen
 
 CATALOGO_JSON = Path(__file__).resolve().parent.parent / "catalog.json"
 
@@ -54,12 +57,14 @@ def nota(p: Pedido) -> str:
 
 
 class Cargador:
-    def __init__(self, rpc, aplicar: bool):
-        self.rpc, self.aplicar = rpc, aplicar
+    def __init__(self, rpc, aplicar: bool, refrescar: bool = False):
+        self.rpc, self.aplicar, self.refrescar = rpc, aplicar, refrescar
+        self.iva_id: int | None = None
         self.productos: dict[str, int] = {}   # sku -> product.product id
         self.clientes: dict[str, int] = {}    # clave -> res.partner id
         self.etiquetas: dict[str, int] = {}
-        self.contador = {"productos": 0, "clientes": 0, "pedidos": 0, "omitidos": 0, "moneda": 0}
+        self.contador = {"productos": 0, "clientes": 0, "pedidos": 0, "omitidos": 0, "moneda": 0,
+                         "actualizados": 0, "iva": 0}
 
     def _buscar_o_crear(self, modelo: str, dominio: list, vals: dict, clave: str) -> int | None:
         ids = self.rpc.search(modelo, dominio, limit=1)
@@ -70,18 +75,41 @@ class Cargador:
             return None
         return self.rpc.create(modelo, vals)
 
+    def iva(self, cat: dict) -> None:
+        """Impuesto de venta «IVA 12% (incluido)»: los precios de la hoja y del catálogo ya traen IVA. Se deja también
+        como impuesto de venta por defecto de la compañía, para pedidos y productos nuevos."""
+        cfg = cat["iva"]
+        dom = [("name", "=", cfg["nombre"]), ("type_tax_use", "=", "sale")]
+        campos = self.rpc.call("account.tax", "fields_get", [], attributes=["type"])
+        # Odoo 18 usa price_include_override ('tax_included'); versiones anteriores, price_include (bool)
+        incluido = {"price_include_override": "tax_included"} if "price_include_override" in campos else {"price_include": True}
+        vals = {"name": cfg["nombre"], "amount": cfg["porcentaje"], "amount_type": "percent", "type_tax_use": "sale",
+                **incluido}
+        self.iva_id = self._buscar_o_crear("account.tax", dom, vals, "iva")
+        if self.iva_id and self.aplicar:
+            empresa = self.rpc.call("res.company", "search", [], limit=1)
+            if empresa and "account_sale_tax_id" in self.rpc.call("res.company", "fields_get", [], attributes=["type"]):
+                self.rpc.call("res.company", "write", empresa, {"account_sale_tax_id": self.iva_id})
+
+    def _impuesto(self) -> dict:
+        return {"tax_id": [(6, 0, [self.iva_id] if self.iva_id else [])]}
+
     def catalogo(self) -> None:
         cat = json.loads(CATALOGO_JSON.read_text(encoding="utf-8"))
+        self.iva(cat)
         items = [(p["sku"], p["nombre"], p["precio"], "consu") for p in cat["productos"]]
         items += [(s["sku"], s["nombre"], 0, "service") for s in cat["servicios"]]
         items.append((cat["historico"]["sku"], cat["historico"]["nombre"], 0, "service"))
         for sku, nombre, precio, tipo in items:
             vals = {"name": nombre, "default_code": sku, "list_price": precio, "type": tipo,
-                    "sale_ok": True, "purchase_ok": tipo == "consu"}
+                    "sale_ok": True, "purchase_ok": tipo == "consu",
+                    "taxes_id": [(6, 0, [self.iva_id] if self.iva_id else [])]}
             if tipo == "consu":
                 vals["is_storable"] = True  # Odoo 18: producto almacenable (Inventario)
             tmpl = self._buscar_o_crear("product.template", [("default_code", "=", sku)], vals, "productos")
             if tmpl:
+                if self.iva_id and self.aplicar:  # productos creados antes de definir el IVA
+                    self.rpc.call("product.template", "write", [tmpl], {"taxes_id": [(6, 0, [self.iva_id])]})
                 self.productos[sku] = self.rpc.search("product.product", [("product_tmpl_id", "=", tmpl)], limit=1)[0]
 
     def etiqueta(self, nombre: str) -> int | None:
@@ -130,23 +158,38 @@ class Cargador:
         if listas:
             self.rpc.call("product.pricelist", "write", listas, {"currency_id": gtq[0]})
 
+    def _linea(self, sku: str, cantidad: float, precio: float, nombre: str | None = None) -> tuple:
+        vals = {"product_id": self.productos.get(sku), "product_uom_qty": cantidad, "price_unit": precio,
+                **self._impuesto()}
+        if nombre:
+            vals["name"] = nombre
+        return (0, 0, vals)
+
     def lineas(self, p: Pedido) -> list:
-        # tax_id vacío a propósito: Odoo le pone a cada línea el impuesto de venta por defecto (15 %) y el TOTAL de la
-        # hoja (Q73,930.00) dejaría de cuadrar. El IVA del negocio se decide aparte; los pedidos históricos van netos.
-        sin_impuesto = {"tax_id": [(6, 0, [])]}
-        prod = p.sku or "GT-OTROS"
-        nombre = p.producto_texto if p.sku is None else None
-        ls = [(0, 0, {"product_id": self.productos.get(prod), "product_uom_qty": p.cantidad,
-                      "price_unit": p.precio_unitario, **sin_impuesto, **({"name": nombre} if nombre else {})})]
+        if p.desglose:  # combo partido en productos de catálogo (+ línea de descuento)
+            ls = [self._linea(sku, 1, precio) for sku, precio in p.desglose]
+        elif p.sku is None:  # texto libre: línea histórica con el texto original
+            ls = [self._linea("GT-OTROS", p.cantidad, p.precio_unitario, p.producto_texto)]
+        else:  # «Cozy Box + Vino» entra como Cozy Box con el texto original en la descripción
+            ls = [self._linea(p.sku, p.cantidad, p.precio_unitario,
+                              None if producto_exacto(p.producto_texto) else p.producto_texto)]
         if p.envio:
-            ls.append((0, 0, {"product_id": self.productos.get("GT-ENVIO"), "product_uom_qty": 1, "price_unit": p.envio,
-                              **sin_impuesto}))
+            ls.append(self._linea("GT-ENVIO", 1, p.envio))
         return ls
 
     def pedido(self, p: Pedido) -> None:
         nombre = nombre_pedido(p)
-        if self.rpc.search("sale.order", [("name", "=", nombre)], limit=1):
+        existente = self.rpc.search("sale.order", [("name", "=", nombre)], limit=1)
+        if existente and not self.refrescar:
             self.contador["omitidos"] += 1
+            return
+        if existente:
+            self.contador["actualizados"] += 1
+            if self.aplicar:
+                # Odoo no deja borrar líneas de un pedido confirmado: se baja a borrador, se reescriben y se vuelve a «sale»
+                self.rpc.write("sale.order", existente, {"state": "draft"})
+                self.rpc.write("sale.order", existente, {"note": nota(p), "order_line": [(5, 0, 0)] + self.lineas(p)})
+                self.rpc.write("sale.order", existente, {"state": "sale"})
             return
         self.contador["pedidos"] += 1
         cliente = self.cliente(p)
@@ -171,6 +214,7 @@ def main(argv=None) -> int:
     ap.add_argument("modo", choices=["check", "load"])
     ap.add_argument("excel")
     ap.add_argument("--apply", action="store_true", help="crear de verdad en Odoo (sin esto, solo simula)")
+    ap.add_argument("--refresh", action="store_true", help="reescribir líneas e impuesto de pedidos ya cargados")
     a = ap.parse_args(argv)
     pedidos = leer_pedidos(a.excel)
     print(resumen(pedidos))
@@ -182,7 +226,7 @@ def main(argv=None) -> int:
     except KeyError as e:
         print(f"Falta la variable de entorno {e}", file=sys.stderr)
         return 2
-    c = Cargador(rpc, a.apply).correr(pedidos)
+    c = Cargador(rpc, a.apply, a.refresh).correr(pedidos)
     print(("CREADO" if a.apply else "SIMULACIÓN (usá --apply para crear)") + f": {c}")
     return 0
 

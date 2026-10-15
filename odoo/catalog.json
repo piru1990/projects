@@ -1,14 +1,69 @@
 {
-  "_nota": "Catálogo de producto terminado. Los sku coinciden con los id de PRODUCTS en gatheringsgt/assets/shared.js. Materias primas y costos: pendientes (Excel de Andrea).",
+  "_nota": "Catálogo. Los sku GT-SINGLE..GT-TAILORED coinciden con los id de PRODUCTS en gatheringsgt/assets/shared.js. Todos los precios INCLUYEN IVA (12 %). Materias primas y costos: pendientes (Excel de Andrea).",
   "productos": [
-    {"sku": "GT-SINGLE",    "nombre": "The Single",    "precio": 50},
-    {"sku": "GT-COZY",      "nombre": "The Cozy",      "precio": 250},
-    {"sku": "GT-HOMESTYLE", "nombre": "The Homestyle", "precio": 450},
-    {"sku": "GT-GATHERING", "nombre": "The Gathering", "precio": 700},
-    {"sku": "GT-TAILORED",  "nombre": "The Tailored",  "precio": 0}
+    {
+      "sku": "GT-SINGLE",
+      "nombre": "The Single",
+      "precio": 50
+    },
+    {
+      "sku": "GT-COZY",
+      "nombre": "The Cozy",
+      "precio": 250
+    },
+    {
+      "sku": "GT-HOMESTYLE",
+      "nombre": "The Homestyle",
+      "precio": 450
+    },
+    {
+      "sku": "GT-GATHERING",
+      "nombre": "The Gathering",
+      "precio": 700
+    },
+    {
+      "sku": "GT-TAILORED",
+      "nombre": "The Tailored",
+      "precio": 0
+    },
+    {
+      "sku": "GT-COZYBOX",
+      "nombre": "Cozy Box",
+      "precio": 250
+    },
+    {
+      "sku": "GT-LITTLEDOME",
+      "nombre": "Little Dome",
+      "precio": 30
+    },
+    {
+      "sku": "GT-EXPERIENCE",
+      "nombre": "The Experience",
+      "precio": 1750
+    }
   ],
   "servicios": [
-    {"sku": "GT-ENVIO", "nombre": "Envío a domicilio"}
+    {
+      "sku": "GT-ENVIO",
+      "nombre": "Envío a domicilio"
+    },
+    {
+      "sku": "GT-DESCUENTO",
+      "nombre": "Descuento"
+    }
   ],
-  "historico": {"sku": "GT-OTROS", "nombre": "Otros productos (histórico)"}
+  "historico": {
+    "sku": "GT-OTROS",
+    "nombre": "Otros productos (histórico)"
+  },
+  "iva": {
+    "nombre": "IVA 12% (incluido)",
+    "porcentaje": 12
+  },
+  "alias": {
+    "cozy box": "GT-COZYBOX",
+    "little dome": "GT-LITTLEDOME",
+    "experience": "GT-EXPERIENCE"
+  },
+  "_alias_nota": "Texto del Excel (sin «The», minúsculas) que empieza con esta clave -> sku. «Cozy Box + Vino» entra como Cozy Box con el texto original en la descripción de la línea."
 }

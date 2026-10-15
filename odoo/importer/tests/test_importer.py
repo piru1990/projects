@@ -32,7 +32,9 @@ def excel(tmp_path):
                    **{"FECHA DE PAGO": "13/02/202", "ESTADO DEL PAGO": "Pendiente", "MÉTODO DE PAGO": "Pendiente"}))
     ws.append(fila(4, "ENERO", "06/01/2026", "06/01/2026", "Luis", 2, "Tailored", 200, 0, 200,
                    **{"CELULAR / WHATSAPP": 59781113.0, "NOMBRE DE EMPRESA": "Lumen Studio", "TIPO DE CLIENTE": "Corporativo"}))
-    ws.append([None] * 16 + ["=SUM(Q2:Q5)"])
+    ws.append(fila(5, "ENERO", "07/01/2026", "07/01/2026", "Marta", 1, "Cozy + Single", 280, 0, 280))  # combo con descuento
+    ws.append(fila(6, "ENERO", "08/01/2026", "08/01/2026", "Marta", 2, "The Cozy Box", 250, 0, 500))  # alias de catálogo
+    ws.append([None] * 16 + ["=SUM(Q2:Q7)"])
     ruta = tmp_path / "ventas.xlsx"
     wb.save(ruta)
     return str(ruta)
@@ -46,7 +48,7 @@ def test_fechas_texto_y_invertidas(excel):
 
 
 def test_fila_de_totales_se_ignora_y_cuenta(excel):
-    assert [x.numero for x in normalize.leer_pedidos(excel)] == [1, 2, 3, 4]
+    assert [x.numero for x in normalize.leer_pedidos(excel)] == [1, 2, 3, 4, 5, 6]
 
 
 def test_formula_en_subtotal(excel):
@@ -68,7 +70,7 @@ def test_total_del_excel_manda_cuando_difiere(excel):
 
 
 def test_totales_coinciden_con_excel(excel):
-    assert sum(x.total for x in normalize.leer_pedidos(excel)) == 285 + 600 + 750 + 200
+    assert sum(x.total for x in normalize.leer_pedidos(excel)) == 285 + 600 + 750 + 200 + 280 + 500
 
 
 def test_aritmetica_rechaza_codigo():
@@ -95,7 +97,18 @@ class FakeOdoo:
             return [1]  # GTQ
         if (model, method) == ("res.company", "search_read"):
             return [{"id": 1, "currency_id": [self.moneda_empresa, "X"]}]
+        if method == "fields_get":
+            return {"price_include_override": {}, "account_sale_tax_id": {}}
+        if (model, method) == ("res.company", "search"):
+            return [1]
         return [7] if method == "search" else True
+
+    def write(self, model, ids, vals):
+        self.llamadas.append((model, "write", (ids, vals)))
+        for r in self.t.get(model, []):
+            if r["id"] in ids:
+                r.update(vals)
+        return True
 
     def create(self, model, vals):
         self.n += 1
@@ -109,27 +122,30 @@ class FakeOdoo:
 def test_carga_dry_run_no_crea(excel):
     odoo = FakeOdoo()
     c = import_sales.Cargador(odoo, aplicar=False).correr(normalize.leer_pedidos(excel))
-    assert odoo.t == {} and c["pedidos"] == 4 and c["clientes"] == 3  # Ana (2 pedidos), Cliente no registrado, Luis
+    assert odoo.t == {} and c["pedidos"] == 6 and c["clientes"] == 4  # Ana (2 pedidos), Cliente no registrado, Luis, Marta
 
 
 def test_carga_real_e_idempotente(excel):
     odoo, pedidos = FakeOdoo(), normalize.leer_pedidos(excel)
     c1 = import_sales.Cargador(odoo, aplicar=True).correr(pedidos)
-    assert c1["pedidos"] == 4 and len(odoo.t["sale.order"]) == 4 and len(odoo.t["res.partner"]) == 3
+    assert c1["pedidos"] == 6 and len(odoo.t["sale.order"]) == 6 and len(odoo.t["res.partner"]) == 4
     o1 = next(o for o in odoo.t["sale.order"] if o["name"] == "GT-0001")
     assert o1["state"] == "sale" and o1["date_order"] == "2025-11-27 18:00:00" and len(o1["order_line"]) == 2  # producto + envío
-    assert all(l[2]["tax_id"] == [(6, 0, [])] for o in odoo.t["sale.order"] for l in o["order_line"])  # sin 15 % por defecto
+    iva = odoo.t["account.tax"][0]
+    assert iva["amount"] == 12 and iva["price_include_override"] == "tax_included"
+    assert all(l[2]["tax_id"] == [(6, 0, [iva["id"]])] for o in odoo.t["sale.order"] for l in o["order_line"])  # IVA 12 % incluido
     o3 = next(o for o in odoo.t["sale.order"] if o["name"] == "GT-0003")
     assert o3["order_line"][0][2]["name"] == "Cozy y Single" and "Revisar:" in o3["note"]
+    assert o3["order_line"][0][2]["product_id"] == odoo_sku(odoo, "GT-OTROS")
     c2 = import_sales.Cargador(odoo, aplicar=True).correr(pedidos)
-    assert c2["pedidos"] == 0 and c2["omitidos"] == 4 and len(odoo.t["sale.order"]) == 4 and len(odoo.t["product.template"]) == 7
+    assert c2["pedidos"] == 0 and c2["omitidos"] == 6 and len(odoo.t["sale.order"]) == 6 and len(odoo.t["account.tax"]) == 1
 
 
 def test_moneda_se_corrige_a_gtq_solo_al_aplicar(excel):
     pedidos = normalize.leer_pedidos(excel)
     ya_gtq = FakeOdoo(moneda_empresa=1)
     assert import_sales.Cargador(ya_gtq, aplicar=True).correr(pedidos)["moneda"] == 0
-    assert not [c for c in ya_gtq.llamadas if c[1] == "write"]
+    assert not [c for c in ya_gtq.llamadas if c[1] == "write" and "currency_id" in c[2][-1]]
     en_usd = FakeOdoo(moneda_empresa=2)  # la base nace en USD
     assert import_sales.Cargador(en_usd, aplicar=False).correr(pedidos)["moneda"] == 1
     assert not [c for c in en_usd.llamadas if c[1] == "write"]  # simulación: no escribe
@@ -147,3 +163,39 @@ def test_coherencia_de_anios():
     av = []  # entrega anterior sin arreglo posible: solo avisa
     assert normalize._coherencia_fechas(dt.date(2026, 9, 24), dt.date(2026, 9, 14), av) == (dt.date(2026, 9, 24), dt.date(2026, 9, 14))
     assert "anterior" in av[0]
+
+
+def odoo_sku(odoo, sku):
+    tmpl = next(t["id"] for t in odoo.t["product.template"] if t["default_code"] == sku)
+    return next(p["id"] for p in odoo.t["product.product"] if p["product_tmpl_id"] == tmpl)
+
+
+def test_combo_se_parte_en_catalogo_con_descuento(excel):
+    p5 = {x.numero: x for x in normalize.leer_pedidos(excel)}[5]
+    assert p5.desglose == [("GT-COZY", 250.0), ("GT-SINGLE", 50.0), ("GT-DESCUENTO", -20.0)]
+    assert any("con descuento" in a for a in p5.avisos)
+    odoo = FakeOdoo()
+    import_sales.Cargador(odoo, aplicar=True).correr(normalize.leer_pedidos(excel))
+    o5 = next(o for o in odoo.t["sale.order"] if o["name"] == "GT-0005")
+    assert [l[2]["price_unit"] for l in o5["order_line"]] == [250.0, 50.0, -20.0]
+    assert sum(l[2]["price_unit"] * l[2].get("product_uom_qty", 1) for l in o5["order_line"]) == 280
+
+
+def test_combo_con_extra_queda_como_texto_libre(excel):
+    p3 = {x.numero: x for x in normalize.leer_pedidos(excel)}[3]  # «Cozy y Single» por 750 > lista 300
+    assert p3.desglose is None and p3.sku is None
+
+
+def test_alias_de_catalogo(excel):
+    p6 = {x.numero: x for x in normalize.leer_pedidos(excel)}[6]
+    assert p6.sku == "GT-COZYBOX" and p6.desglose is None
+
+
+def test_refresh_reescribe_lineas_de_pedidos_existentes(excel):
+    odoo, pedidos = FakeOdoo(), normalize.leer_pedidos(excel)
+    import_sales.Cargador(odoo, aplicar=True).correr(pedidos)
+    c = import_sales.Cargador(odoo, aplicar=True, refrescar=True).correr(pedidos)
+    assert c["actualizados"] == 6 and c["pedidos"] == 0 and len(odoo.t["sale.order"]) == 6
+    assert all(o["state"] == "sale" for o in odoo.t["sale.order"])
+    sim = import_sales.Cargador(odoo, aplicar=False, refrescar=True).correr(pedidos)
+    assert sim["actualizados"] == 6

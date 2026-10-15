@@ -39,13 +39,15 @@ Qué hace con el Excel real (111 pedidos, 27 nov 2025 a 14 oct 2026, Q73,930, ig
 - Corrige las fechas que Excel leyó con día y mes invertidos (las 46 fechas reales) y valida contra la columna MES. Corrige años mal tecleados (pedido 46, entregas de 7 pedidos de mayo con 2025) y avisa de la entrega anterior al pedido (pedido 106).
 - `SUBTOTAL` es el precio unitario; si el TOTAL de la hoja no cuadra (pedido 41), manda el TOTAL de la hoja.
 - Crea el catálogo (`catalog.json`: SKU `GT-SINGLE`, `GT-COZY`, ...), clientes (79, unidos por nombre sin acentos ni mayúsculas) y pedidos `GT-0001`...
-- 16 pedidos tienen producto en texto libre (combos, cajas, vino, «Little Dome»...): entran como línea «Otros productos (histórico)» con el texto original y la nota «Revisar:». Hay que decidir con Andrea si algunos pasan al catálogo.
+- 16 pedidos tenían producto en texto libre. Con los datos disponibles se resolvieron 7: «Cozy Box», «Little Dome» y «Experience» son productos de catálogo (alias en `catalog.json`) y un combo cobrado por debajo de la lista se parte en sus productos más una línea `GT-DESCUENTO` negativa. Quedan 9 en texto libre (línea «Otros productos (histórico)» con el texto original y la nota «Revisar:») a la espera del Excel de costos de Andrea: #8, 11, 43, 70, 71, 90, 100, 106, 109.
+- **IVA:** los precios del catálogo y de la hoja ya incluyen IVA 12 %. Existe el impuesto «IVA 12% (incluido)» (precio con impuesto incluido), por defecto en la compañía, los productos y las líneas; los totales no cambian. Supuesto a confirmar con el contador.
+- `load --apply --refresh` reescribe las líneas de pedidos ya cargados (pasa el pedido a borrador, cambia líneas, lo confirma de nuevo) sin duplicar ni mover inventario. Haga un respaldo antes.
 - Pedidos históricos entran confirmados sin generar entregas, para no mover el inventario. Pago, entrega, dirección y facturación quedan en la nota del pedido.
 
 ## Estado de la verificación
 Corrido contra un Odoo 18 real en la Mac mini (Colima) el 2026-10-14/15: 7 productos, 79 clientes y 111 pedidos `GT-0001`..`GT-0111`, suma Q73,930.00; la segunda corrida omite los 111 (idempotente). La primera carga reveló dos cosas que las pruebas con Odoo simulado no podían ver, ya corregidas en el importador:
 - **Moneda:** Odoo crea la base en USD y los pedidos heredan esa moneda. El importador (`moneda()`) deja la compañía y las listas de precios en GTQ antes de crear pedidos.
-- **Impuestos:** Odoo agrega un impuesto de venta por defecto (15 %) a cada línea, lo que sube el total a Q85,019.50. Las líneas importadas llevan `tax_id` vacío: los pedidos históricos van netos y el TOTAL de la hoja manda. El IVA del negocio (y el plan contable) se decide aparte con Andrea/contador.
+- **Impuestos:** Odoo agrega un impuesto de venta por defecto (15 %) a cada línea, lo que sube el total a Q85,019.50. Se resolvió dejando el IVA 12 % como impuesto incluido en el precio (ver arriba); el TOTAL de la hoja manda. El plan contable queda genérico hasta hablar con el contador.
 Los campos usados son los de Odoo 18 (`type=consu` + `is_storable`). Pruebas: `python3 -m pytest importer/tests` (Odoo simulado y Excel sintético).
 
 ## Falta (siguientes pasos)

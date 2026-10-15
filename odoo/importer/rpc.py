@@ -21,3 +21,6 @@ class OdooRPC:
 
     def create(self, model: str, vals: dict) -> int:
         return self.call(model, "create", vals)
+
+    def write(self, model: str, ids: list[int], vals: dict) -> bool:
+        return self.call(model, "write", ids, vals)

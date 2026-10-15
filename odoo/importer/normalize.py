@@ -11,15 +11,15 @@ from __future__ import annotations
 
 import ast
 import datetime as dt
+import json
 import operator
 import re
 import unicodedata
+from pathlib import Path
 from dataclasses import dataclass, field
 
 MESES = {"ENERO": 1, "FEBRERO": 2, "MARZO": 3, "ABRIL": 4, "MAYO": 5, "JUNIO": 6, "JULIO": 7,
          "AGOSTO": 8, "SEPTIEMBRE": 9, "OCTUBRE": 10, "NOVIEMBRE": 11, "DICIEMBRE": 12}
-CATALOGO = {"single": "GT-SINGLE", "cozy": "GT-COZY", "homestyle": "GT-HOMESTYLE",
-            "gathering": "GT-GATHERING", "tailored": "GT-TAILORED"}
 SIN_CLIENTE = "Cliente no registrado"
 
 
@@ -37,6 +37,7 @@ class Pedido:
     cantidad: float
     producto_texto: str
     sku: str | None            # None = texto libre (línea histórica)
+    desglose: list[tuple[str, float]] | None   # combo partido en líneas de catálogo (+ descuento)
     precio_unitario: float
     direccion: str | None
     observaciones: str | None
@@ -151,12 +152,46 @@ def _telefono(v) -> str | None:
     return "+502 " + digitos if len(digitos) == 8 else digitos
 
 
+_CAT = json.loads((Path(__file__).resolve().parent.parent / "catalog.json").read_text(encoding="utf-8"))
+# nombre sin «The», en minúsculas -> sku, y su precio de lista (con IVA)
+CATALOGO = {re.sub(r"^the\s+", "", quitar_acentos(p["nombre"]).casefold()): p["sku"] for p in _CAT["productos"]}
+PRECIOS = {p["sku"]: p["precio"] for p in _CAT["productos"]}
+ALIAS = _CAT["alias"]
+
+
+def _clave_producto(texto: str) -> str:
+    return re.sub(r"^the\s+", "", quitar_acentos(texto).casefold().strip())
+
+
 def _producto(texto: str | None) -> str | None:
+    """sku del catálogo si el texto es un producto (o un alias como «Cozy Box + Vino»); None = texto libre."""
     if not texto:
         return None
-    k = quitar_acentos(texto).casefold().strip()
-    k = re.sub(r"^the\s+", "", k)
-    return CATALOGO.get(k)
+    k = _clave_producto(texto)
+    if k in CATALOGO:
+        return CATALOGO[k]
+    return next((sku for alias, sku in ALIAS.items() if k.startswith(alias)), None)
+
+
+def producto_exacto(texto: str | None) -> bool:
+    """True si el texto es exactamente el nombre del catálogo (si no, la línea conserva el texto original)."""
+    return bool(texto) and _clave_producto(texto) in CATALOGO
+
+
+def _desglose(texto: str, cantidad: float, precio: float) -> list[tuple[str, float]] | None:
+    """«Gathering + Cozy» (cantidad 1) -> [(sku, precio de lista), ..., ("GT-DESCUENTO", dif)] si todas las partes son
+    productos con precio y el combo no tiene otra interpretación; si no, None (queda como texto libre)."""
+    if cantidad != 1:
+        return None
+    partes = [p for p in re.split(r"\s*(?:\+|\by\b)\s*", texto.strip(), flags=re.I) if p]
+    skus = [CATALOGO.get(_clave_producto(p)) for p in partes]
+    if len(partes) < 2 or not all(skus) or not all(PRECIOS[k] > 0 for k in skus):
+        return None
+    lineas = [(k, float(PRECIOS[k])) for k in skus]
+    dif = round(precio - sum(p for _, p in lineas), 2)
+    if dif > 0:  # cobró más que la lista: hay algo extra que el texto no dice; mejor revisarlo a mano
+        return None
+    return lineas + ([("GT-DESCUENTO", dif)] if dif else [])
 
 
 def leer_pedidos(ruta: str) -> list[Pedido]:
@@ -186,10 +221,14 @@ def leer_pedidos(ruta: str) -> list[Pedido]:
             f_ped, f_ent = _coherencia_fechas(f_ped, f_ent, av)
         prod = _texto(g("PRODUCTO")) or "(sin producto)"
         sku = _producto(prod)
-        if sku is None:
-            av.append(f"producto fuera del catálogo: {prod!r}")
         precio = _numero(g("SUBTOTAL"), av, "SUBTOTAL")
         cantidad = _numero(g("CANTIDAD"), av, "CANTIDAD") or 1.0
+        desglose = _desglose(prod, cantidad, precio) if sku is None else None
+        if desglose:
+            av.append(f"combo {prod!r} partido en líneas de catálogo"
+                      + (" con descuento" if desglose[-1][0] == "GT-DESCUENTO" else ""))
+        elif sku is None:
+            av.append(f"producto fuera del catálogo: {prod!r}")
         cliente = _texto(g("NOMBRE DEL CLIENTE")) or SIN_CLIENTE
         if clave_cliente(cliente) == "no registrado":
             cliente = SIN_CLIENTE
@@ -212,7 +251,7 @@ def leer_pedidos(ruta: str) -> list[Pedido]:
         pedidos.append(Pedido(
             numero=numero, fecha_pedido=f_ped, fecha_entrega=f_ent, horario=_texto(g("HORARIO DE ENTREGA")),
             cliente=cliente, empresa=empresa, tipo_cliente=tipo, telefono=_telefono(g("CELULAR / WHATSAPP")),
-            contacto=_texto(g("IG / FB / EMAIL")), cantidad=cantidad, producto_texto=prod, sku=sku,
+            contacto=_texto(g("IG / FB / EMAIL")), cantidad=cantidad, producto_texto=prod, sku=sku, desglose=desglose,
             precio_unitario=precio, direccion=_texto(g("DIRECCIÓN DE ENTREGA")), observaciones=obs,
             envio=envio,
             metodo_pago=None if (metodo or "").casefold() == "pendiente" else metodo,
@@ -225,7 +264,8 @@ def leer_pedidos(ruta: str) -> list[Pedido]:
 def resumen(pedidos: list[Pedido]) -> str:
     n_cli = len({clave_cliente(p.cliente) for p in pedidos})
     rev = [p for p in pedidos if p.avisos]
+    libres = [p for p in pedidos if p.sku is None and not p.desglose]
     lineas = [f"{len(pedidos)} pedidos, {n_cli} clientes distintos, total Q{sum(p.total for p in pedidos):,.2f}",
-              f"{sum(1 for p in pedidos if p.sku is None)} con producto fuera del catálogo, {len(rev)} con avisos"]
+              f"{len(libres)} con producto fuera del catálogo (texto libre), {len(rev)} con avisos"]
     lineas += [f"  #{p.numero}: {'; '.join(p.avisos)}" for p in rev]
     return "\n".join(lineas)
