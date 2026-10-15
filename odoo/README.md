@@ -22,7 +22,7 @@ Odoo 18 Community + PostgreSQL en la Mac mini (Docker), expuesto por Cloudflare 
 
 ## Cloudflare Tunnel
 Con `CLOUDFLARE_TUNNEL_TOKEN` en `.env`: `docker compose --profile tunnel up -d`. En Cloudflare Zero Trust, el túnel debe tener un hostname público que apunte al servicio `http://odoo:8069`.
-**Pendiente de decidir:** el hostname necesita una zona DNS administrada por Cloudflare. `gatheringsgt.com` hoy está en Squarespace (con el correo de Google Workspace), así que hay que (a) pasar esa zona a Cloudflare copiando antes MX/SPF/DKIM, o (b) usar otro dominio ya en Cloudflare. Recomiendo además proteger el hostname con Cloudflare Access (login por correo) antes del login de Odoo.
+**Estado (2026-10-15):** la zona `gatheringsgt.com` ya está en Cloudflare (se copiaron MX/SPF/DKIM). Túnel `gatheringsgt-erp` (remote-managed, en Zero Trust Free, equipo `late-dew-298a`) con hostname público `erp.gatheringsgt.com` -> `http://odoo:8069`. El hostname está protegido por una aplicación self-hosted de Cloudflare Access con la política «Solo Allan y Andrea» (Allow, solo `hola@gatheringsgt.com` y `rosales.allan@gmail.com`; login por código de un solo uso o cuenta de Cloudflare). El token del túnel vive solo en `.env`; para rotarlo: Tunnels > gatheringsgt-erp > Rotate token y actualizar `.env`.
 
 ## Importar el Excel de ventas
 El Excel tiene datos de clientes: va en `odoo/data/` (ignorado por git), nunca al repo.
