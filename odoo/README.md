@@ -18,7 +18,8 @@ Odoo 18 Community + PostgreSQL en la Mac mini (Docker), expuesto por Cloudflare 
 1. Docker instalado (Docker Desktop, o Colima: `brew install colima docker docker-compose` + `colima start --cpu 2 --memory 3`; con Homebrew hay que añadir `"cliPluginsExtraDirs": ["/opt/homebrew/lib/docker/cli-plugins"]` a `~/.docker/config.json` para que exista `docker compose`). `cp .env.example .env` y completar contraseñas (el `.env` no se sube al repo; `chmod 600`).
 2. `./scripts/init-db.sh` genera `odoo.conf` (contraseña maestra; ignorado por git), crea la base `gatherings` e instala los módulos.
 3. `docker compose up -d` y abrir http://localhost:8069. El usuario `admin` nace con contraseña `admin`: cambiarla de inmediato (guardada en `.env` como `ODOO_ADMIN_USER_PASSWORD`; el importador la usa como `ODOO_PASSWORD`).
-4. Respaldo diario: `./scripts/backup.sh` desde cron/launchd.
+4. Respaldo diario: `./scripts/install-backup-launchd.sh` instala un LaunchAgent (todos los días 03:15) que corre `scripts/backup.sh`: base (`gatherings-AAAA-MM-DD.sql.gz`) y adjuntos (`gatherings-filestore-AAAA-MM-DD.tar.gz`) en `odoo/backups/` (permisos 600, ignorado por git, últimos 14 de cada tipo). Log: `~/.local/var/log/gatherings-backup.log`. Restaurar: `gzip -dc backups/ARCHIVO.sql.gz | docker compose exec -T db psql -U odoo -d BASE_NUEVA` (probado: restaura los 111 pedidos y los usuarios). Está en el mismo disco: conviene copiar `odoo/backups/` a otro lugar.
+5. Arranque automático (Colima): `brew services start colima` lo arranca al iniciar sesión, y los contenedores (`restart: unless-stopped`) vuelven solos. Tras un reinicio de la Mac, Odoo vuelve cuando se inicia sesión: sin inicio de sesión automático no arranca solo.
 
 ## Cloudflare Tunnel
 Con `CLOUDFLARE_TUNNEL_TOKEN` en `.env`: `docker compose --profile tunnel up -d`. En Cloudflare Zero Trust, el túnel debe tener un hostname público que apunte al servicio `http://odoo:8069`.
