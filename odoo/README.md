@@ -15,9 +15,9 @@ Odoo 18 Community + PostgreSQL en la Mac mini (Docker), expuesto por Cloudflare 
 «Temporalidad por eventos» se resuelve con las fechas de cada pedido (`date_order`, `commitment_date`) y los movimientos de inventario/compras: todo es transaccional con fecha.
 
 ## Instalar (en la Mac mini)
-1. Docker Desktop instalado. `cp .env.example .env` y completar contraseñas (el `.env` no se sube al repo).
-2. `./scripts/init-db.sh` crea la base `gatherings` e instala los módulos.
-3. `docker compose up -d` y abrir http://localhost:8069 (usuario `admin`, pone la contraseña en el primer ingreso).
+1. Docker instalado (Docker Desktop, o Colima: `brew install colima docker docker-compose` + `colima start --cpu 2 --memory 3`; con Homebrew hay que añadir `"cliPluginsExtraDirs": ["/opt/homebrew/lib/docker/cli-plugins"]` a `~/.docker/config.json` para que exista `docker compose`). `cp .env.example .env` y completar contraseñas (el `.env` no se sube al repo; `chmod 600`).
+2. `./scripts/init-db.sh` genera `odoo.conf` (contraseña maestra; ignorado por git), crea la base `gatherings` e instala los módulos.
+3. `docker compose up -d` y abrir http://localhost:8069. El usuario `admin` nace con contraseña `admin`: cambiarla de inmediato (guardada en `.env` como `ODOO_ADMIN_USER_PASSWORD`; el importador la usa como `ODOO_PASSWORD`).
 4. Respaldo diario: `./scripts/backup.sh` desde cron/launchd.
 
 ## Cloudflare Tunnel
@@ -43,7 +43,10 @@ Qué hace con el Excel real (111 pedidos, 27 nov 2025 a 14 oct 2026, Q73,930, ig
 - Pedidos históricos entran confirmados sin generar entregas, para no mover el inventario. Pago, entrega, dirección y facturación quedan en la nota del pedido.
 
 ## Estado de la verificación
-Las pruebas del importador (`python3 -m pytest importer/tests`) usan un Odoo simulado y un Excel sintético. **No se ha corrido contra un Odoo real** (el entorno donde se escribió no tiene Docker en ejecución); la primera carga real en la Mac mini es la verificación. Los campos usados son los de Odoo 18 (`type=consu` + `is_storable`).
+Corrido contra un Odoo 18 real en la Mac mini (Colima) el 2026-10-14/15: 7 productos, 79 clientes y 111 pedidos `GT-0001`..`GT-0111`, suma Q73,930.00; la segunda corrida omite los 111 (idempotente). La primera carga reveló dos cosas que las pruebas con Odoo simulado no podían ver, ya corregidas en el importador:
+- **Moneda:** Odoo crea la base en USD y los pedidos heredan esa moneda. El importador (`moneda()`) deja la compañía y las listas de precios en GTQ antes de crear pedidos.
+- **Impuestos:** Odoo agrega un impuesto de venta por defecto (15 %) a cada línea, lo que sube el total a Q85,019.50. Las líneas importadas llevan `tax_id` vacío: los pedidos históricos van netos y el TOTAL de la hoja manda. El IVA del negocio (y el plan contable) se decide aparte con Andrea/contador.
+Los campos usados son los de Odoo 18 (`type=consu` + `is_storable`). Pruebas: `python3 -m pytest importer/tests` (Odoo simulado y Excel sintético).
 
 ## Falta (siguientes pasos)
 - Materias primas, proveedores y costos: llegan en el Excel de Andrea (importador análogo + listas de materiales).

@@ -80,13 +80,22 @@ def test_aritmetica_rechaza_codigo():
 class FakeOdoo:
     """Odoo en memoria: solo los dominios [(campo, '=', valor)] que usa el importador."""
 
-    def __init__(self):
-        self.t, self.n = {}, 0
+    def __init__(self, moneda_empresa=1):
+        self.t, self.n, self.llamadas, self.moneda_empresa = {}, 0, [], moneda_empresa
 
     def search(self, model, domain, limit=None):
         filas = self.t.get(model, [])
         ids = [r["id"] for r in filas if all(r.get(c) == v for c, _, v in domain)]
         return ids[:limit] if limit else ids
+
+    def call(self, model, method, *args, **kw):
+        """Solo lo que usa Cargador.moneda(); `moneda_empresa` es el id de la moneda de la compañía simulada."""
+        self.llamadas.append((model, method, args))
+        if (model, method) == ("res.currency", "search"):
+            return [1]  # GTQ
+        if (model, method) == ("res.company", "search_read"):
+            return [{"id": 1, "currency_id": [self.moneda_empresa, "X"]}]
+        return [7] if method == "search" else True
 
     def create(self, model, vals):
         self.n += 1
@@ -109,10 +118,25 @@ def test_carga_real_e_idempotente(excel):
     assert c1["pedidos"] == 4 and len(odoo.t["sale.order"]) == 4 and len(odoo.t["res.partner"]) == 3
     o1 = next(o for o in odoo.t["sale.order"] if o["name"] == "GT-0001")
     assert o1["state"] == "sale" and o1["date_order"] == "2025-11-27 18:00:00" and len(o1["order_line"]) == 2  # producto + envío
+    assert all(l[2]["tax_id"] == [(6, 0, [])] for o in odoo.t["sale.order"] for l in o["order_line"])  # sin 15 % por defecto
     o3 = next(o for o in odoo.t["sale.order"] if o["name"] == "GT-0003")
     assert o3["order_line"][0][2]["name"] == "Cozy y Single" and "Revisar:" in o3["note"]
     c2 = import_sales.Cargador(odoo, aplicar=True).correr(pedidos)
     assert c2["pedidos"] == 0 and c2["omitidos"] == 4 and len(odoo.t["sale.order"]) == 4 and len(odoo.t["product.template"]) == 7
+
+
+def test_moneda_se_corrige_a_gtq_solo_al_aplicar(excel):
+    pedidos = normalize.leer_pedidos(excel)
+    ya_gtq = FakeOdoo(moneda_empresa=1)
+    assert import_sales.Cargador(ya_gtq, aplicar=True).correr(pedidos)["moneda"] == 0
+    assert not [c for c in ya_gtq.llamadas if c[1] == "write"]
+    en_usd = FakeOdoo(moneda_empresa=2)  # la base nace en USD
+    assert import_sales.Cargador(en_usd, aplicar=False).correr(pedidos)["moneda"] == 1
+    assert not [c for c in en_usd.llamadas if c[1] == "write"]  # simulación: no escribe
+    en_usd = FakeOdoo(moneda_empresa=2)
+    assert import_sales.Cargador(en_usd, aplicar=True).correr(pedidos)["moneda"] == 1
+    escritos = [(c[0], c[2][1]) for c in en_usd.llamadas if c[1] == "write"]
+    assert ("res.company", {"currency_id": 1}) in escritos and ("product.pricelist", {"currency_id": 1}) in escritos
 
 
 def test_coherencia_de_anios():

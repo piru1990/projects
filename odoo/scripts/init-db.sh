@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 [ -f .env ] || { echo "Falta .env (copiá .env.example)"; exit 1; }
 set -a; . ./.env; set +a
 DB="${ODOO_DB:-gatherings}"
+./scripts/gen-conf.sh   # odoo.conf con la contraseña maestra; el compose lo monta
 # contacts+crm: clientes · sale_management: pedidos · stock: inventario · purchase: compras y proveedores
 # mrp: lista de materiales (materias primas -> producto terminado), para los costos de Andrea.
 docker compose up -d db

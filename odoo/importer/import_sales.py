@@ -59,7 +59,7 @@ class Cargador:
         self.productos: dict[str, int] = {}   # sku -> product.product id
         self.clientes: dict[str, int] = {}    # clave -> res.partner id
         self.etiquetas: dict[str, int] = {}
-        self.contador = {"productos": 0, "clientes": 0, "pedidos": 0, "omitidos": 0}
+        self.contador = {"productos": 0, "clientes": 0, "pedidos": 0, "omitidos": 0, "moneda": 0}
 
     def _buscar_o_crear(self, modelo: str, dominio: list, vals: dict, clave: str) -> int | None:
         ids = self.rpc.search(modelo, dominio, limit=1)
@@ -112,13 +112,35 @@ class Cargador:
         self.clientes[k] = cid
         return cid
 
+    def moneda(self) -> None:
+        """Odoo crea la base en USD y esa moneda manda en la compañía y en las listas de precios (y, por ellas, en
+        cada pedido). Los montos del Excel son quetzales: se deja GTQ antes de crear pedidos."""
+        gtq = self.rpc.call("res.currency", "search", [("name", "=", "GTQ"), ("active", "in", [True, False])], limit=1)
+        if not gtq:
+            raise RuntimeError("Odoo no tiene la moneda GTQ")
+        empresa = self.rpc.call("res.company", "search_read", [], fields=["currency_id"], limit=1)[0]
+        if empresa["currency_id"][0] == gtq[0]:
+            return
+        self.contador["moneda"] = 1
+        if not self.aplicar:
+            return
+        self.rpc.call("res.currency", "write", gtq, {"active": True})
+        self.rpc.call("res.company", "write", [empresa["id"]], {"currency_id": gtq[0]})
+        listas = self.rpc.call("product.pricelist", "search", [("currency_id", "!=", gtq[0])])
+        if listas:
+            self.rpc.call("product.pricelist", "write", listas, {"currency_id": gtq[0]})
+
     def lineas(self, p: Pedido) -> list:
+        # tax_id vacío a propósito: Odoo le pone a cada línea el impuesto de venta por defecto (15 %) y el TOTAL de la
+        # hoja (Q73,930.00) dejaría de cuadrar. El IVA del negocio se decide aparte; los pedidos históricos van netos.
+        sin_impuesto = {"tax_id": [(6, 0, [])]}
         prod = p.sku or "GT-OTROS"
         nombre = p.producto_texto if p.sku is None else None
         ls = [(0, 0, {"product_id": self.productos.get(prod), "product_uom_qty": p.cantidad,
-                      "price_unit": p.precio_unitario, **({"name": nombre} if nombre else {})})]
+                      "price_unit": p.precio_unitario, **sin_impuesto, **({"name": nombre} if nombre else {})})]
         if p.envio:
-            ls.append((0, 0, {"product_id": self.productos.get("GT-ENVIO"), "product_uom_qty": 1, "price_unit": p.envio}))
+            ls.append((0, 0, {"product_id": self.productos.get("GT-ENVIO"), "product_uom_qty": 1, "price_unit": p.envio,
+                              **sin_impuesto}))
         return ls
 
     def pedido(self, p: Pedido) -> None:
@@ -137,6 +159,7 @@ class Cargador:
         self.rpc.create("sale.order", vals)
 
     def correr(self, pedidos: list[Pedido]) -> dict:
+        self.moneda()
         self.catalogo()
         for p in pedidos:
             self.pedido(p)

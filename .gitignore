@@ -172,6 +172,7 @@ cython_debug/
 
 # Odoo
 odoo/.env
+odoo/odoo.conf
 odoo/backups/
 odoo/data/
 *.xlsx
