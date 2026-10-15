@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="gt_wa_template_view_list" model="ir.ui.view">
+        <field name="name">gt.wa.template.list</field>
+        <field name="model">gt.wa.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model"/>
+                <field name="body"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="gt_wa_template_view_form" model="ir.ui.view">
+        <field name="name">gt.wa.template.form</field>
+        <field name="model">gt.wa.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="model"/>
+                        <field name="body" widget="text" placeholder="Hola {nombre}, ..."/>
+                        <field name="active"/>
+                    </group>
+                    <div class="text-muted">
+                        Campos: {nombre}, {pedido}, {total}, {entrega}, {tienda}, {telefono_tienda}.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="gt_wa_template_action" model="ir.actions.act_window">
+        <field name="name">Plantillas de WhatsApp</field>
+        <field name="res_model">gt.wa.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="gt_wa_template_menu" name="Plantillas de WhatsApp"
+              parent="sale.menu_sale_config" action="gt_wa_template_action" sequence="90"/>
+</odoo>
