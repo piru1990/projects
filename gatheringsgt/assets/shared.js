@@ -123,7 +123,7 @@ function render(){
   document.querySelectorAll("[data-q]").forEach(e => { e.textContent = cart[e.dataset.q] || 0; });
   $("#cart").classList.toggle("on", n > 0);
   $("#cartTxt").textContent = n + (n === 1 ? " producto" : " productos") + (known && tot ? " · " + money(tot) : "");
-  $("#sum").innerHTML = n ? L.map(x => `${x.n} × ${esc(x.p.name)}`).join("<br>") : "Aún no agregaste nada. También podés escribirnos directo para cotizar un evento.";
+  $("#sum").innerHTML = n ? L.map(x => `${x.n} × ${esc(x.p.name)}`).join("<br>") : "Aún no has agregado nada. También puedes escribirnos directo para cotizar un evento.";
   $("#saveBox").hidden = !n;
 }
 
