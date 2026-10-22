@@ -20,6 +20,11 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 - Pendiente (JOBS-159): precio, descripción y «Qué incluye» de The Little Box, The Celebration Box, The Mini Dome, The Big Dome y The Glass Dome; hoy se cotizan por WhatsApp. Las fotos se prepararon a 1200 px y menos de ~150 KB desde la carpeta «Photos gatherings.com».
 - Desplegar: Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production.
 
+## Estadísticas (Google Analytics 4)
+- `assets/analytics.js` carga GA4 en ambas versiones. Está apagado mientras `GA_ID` esté vacío: pega el ID de medición (`G-XXXXXXXXXX`) y redespliega.
+- Sin señales de publicidad. La primera visita muestra un aviso breve; «No permitir» desactiva la medición en ese navegador (se guarda en `localStorage`, clave `gt_analytics`).
+- Departamento/ciudad: GA4 → Informes → Usuarios → Detalles demográficos → Región / Ciudad. La IP en Guatemala es imprecisa (datos móviles suelen salir como Ciudad de Guatemala).
+
 ## Línea gráfica (JOBS-156)
 Recursos de marca en `assets/brand/` (optimizados a partir de la carpeta «Fotos Webpage» / Gatherings Visual Identity):
 - Paleta: azul `#031666`, verde claro `#AFDCBF`, verde `#4EB969`, gris `#EBEBEB` (variables CSS al inicio de cada página).
