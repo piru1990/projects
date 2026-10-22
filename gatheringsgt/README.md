@@ -18,6 +18,7 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 ## Cómo editar y redesplegar
 - Productos, precios, descripciones y fotos: constante `PRODUCTS` en `assets/shared.js`. `photo` es la foto de la tarjeta, `gallery` las fotos del detalle (`pics("cozy",5)` = `fotos/cozy/1.jpg`…`5.jpg`) e `incl` la lista de «Qué incluye» (vacía = «lo confirmamos por WhatsApp»).
 - Pendiente (JOBS-159): precio, descripción y «Qué incluye» de The Little Box, The Celebration Box, The Mini Dome, The Big Dome y The Glass Dome; hoy se cotizan por WhatsApp. Las fotos se prepararon a 1200 px y menos de ~150 KB desde la carpeta «Photos gatherings.com».
+- Vista previa al compartir: `_worker.js` (Cloudflare Pages, modo avanzado) cambia las etiquetas `og:*` de `/?p=<id>` y `/m/?p=<id>` por las del producto (nombre, precio y foto de su tarjeta). WhatsApp y Facebook no ejecutan JavaScript, por eso se hace en el servidor. La lista `PRODUCTS` de `_worker.js` hay que mantenerla igual que la de `assets/shared.js` (nombre, precio, mínimo). Para refrescar una vista previa ya guardada: Facebook Sharing Debugger, o probar el link con un parámetro extra (`&x=1`).
 - Desplegar: Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production.
 
 ## Estadísticas (Google Analytics 4)
