@@ -35,3 +35,6 @@
   .di h2{font-size:22px}
 }
 .toast{z-index:30}
+
+.ttl{display:inline-flex;align-items:baseline;justify-content:center;gap:.1em;text-transform:uppercase;letter-spacing:.04em}
+.ttl .the{display:inline-block;flex:none;width:2.05em;height:1.37em;background:currentColor;-webkit-mask:url(brand/the-azul.png) center/contain no-repeat;mask:url(brand/the-azul.png) center/contain no-repeat}
