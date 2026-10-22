@@ -35,7 +35,10 @@ html{scroll-behavior:smooth}#menu,#pedido{scroll-margin-top:64px}
 .wai{width:1.2em;height:1.2em;flex:none}.btn-ico{display:inline-flex;align-items:center;justify-content:center;gap:8px}footer a.tel{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}footer a.tel .wai{width:18px;height:18px}
 main{padding:20px 16px}
 .menu{background:var(--mint);margin:-20px -16px 20px;padding:24px 16px 8px}
-.menu h2{font-size:28px;margin-bottom:8px}
+.menu h2{font-size:24px;margin-bottom:8px;white-space:nowrap}
+.ttl{display:inline-flex;align-items:baseline;justify-content:center;gap:.1em;text-transform:uppercase;letter-spacing:.04em}
+.ttl .the{display:inline-block;flex:none;width:2.05em;height:1.37em;background:currentColor;-webkit-mask:url(../assets/brand/the-azul.png) center/contain no-repeat;mask:url(../assets/brand/the-azul.png) center/contain no-repeat}
+h2.up{text-transform:uppercase;letter-spacing:.04em}
 .menu .sub{font-size:14px;line-height:1.5;color:var(--navy)}
 h2{font-size:22px;color:var(--navy);margin-bottom:4px}
 .sub,.note{font:13px var(--sans);color:var(--mut);margin:0 0 14px}
@@ -74,13 +77,13 @@ footer .social svg{width:26px;height:26px}
 <div class="top" id="top"><h1><img src="../assets/brand/the-sharing-azul.png" alt="Gatherings – The Art of Sharing" width="140" height="22"></h1><nav><a href="#menu">Menú</a><a href="#pedido">Pedir</a></nav></div>
 <main>
   <div class="menu" id="menu">
-  <h2>The Gathering's Guide</h2>
+  <h2><span class="ttl"><span class="the" role="img" aria-label="The"></span><span>Gathering's Guide</span></span></h2>
   <p class="sub">Quesos y charcutería premium, frutas frescas y acompañamientos gourmet, cuidadosamente seleccionados y montados a mano para compartir momentos extraordinarios. Elige tus favoritos, arma tu pedido y finaliza tu compra.</p>
   <div id="grid"></div>
   <p class="note">Envío: Q35 – Q45, no incluido en el precio.</p>
   </div>
   <section id="pedido">
-    <h2>Tú Pedido</h2><p class="sub" id="sum"></p>
+    <h2 class="up">Tú Pedido</h2><p class="sub" id="sum"></p>
     <div class="save" id="saveBox" hidden><button type="button" id="saveLink">Guardar y terminar después (copiar link)</button><button type="button" id="clearCart">Vaciar</button></div>
     <form id="f">
       <label>Nombre y Apellido<input name="nombre" required autocomplete="name"></label>
