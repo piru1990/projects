@@ -42,7 +42,9 @@ section{padding:64px 0}
 section h2{font-size:30px;color:var(--navy);text-align:center;margin-bottom:6px}
 .eyebrow{display:block;margin:0 auto 10px;height:44px;width:auto;max-width:80%}
 #menu{background:var(--mint)}
-#menu h2{font-size:40px;margin-bottom:12px}
+#menu h2{font-size:38px;margin-bottom:12px}
+.ttl{display:inline-flex;align-items:baseline;justify-content:center;gap:.1em;text-transform:uppercase;letter-spacing:.04em}
+.ttl .the{display:inline-block;flex:none;width:2.05em;height:1.37em;background:currentColor;-webkit-mask:url(assets/brand/the-azul.png) center/contain no-repeat;mask:url(assets/brand/the-azul.png) center/contain no-repeat}
 #menu .sub{font:17px/1.6 var(--sans);color:var(--navy)}
 #pedido{background:var(--navy) url(assets/brand/fondo-the-azul.webp) center/cover}
 #pedido h2,#pedido .sub{color:#fff}
@@ -98,14 +100,14 @@ footer .social svg{width:24px;height:24px}
 </div>
 
 <section id="menu"><div class="wrap">
-  <h2>The Gathering's Guide</h2>
+  <h2><span class="ttl"><span class="the" role="img" aria-label="The"></span><span>Gathering's Guide</span></span></h2>
   <p class="sub">Quesos y charcutería premium, frutas frescas y acompañamientos gourmet, cuidadosamente seleccionados y montados a mano para compartir momentos extraordinarios. Elige tus favoritos, arma tu pedido y finaliza tu compra.</p>
   <div class="grid" id="grid"></div>
   <p class="note" style="margin-top:20px">Envío: Q35 – Q45, no incluido en el precio de las tablas.</p>
 </div></section>
 
 <section id="pedido"><div class="wrap">
-  <h2>Tú Pedido</h2><p class="sub" id="sum"></p>
+  <h2 style="text-transform:uppercase;letter-spacing:.04em">Tú Pedido</h2><p class="sub" id="sum"></p>
   <div class="save" id="saveBox" hidden><button type="button" id="saveLink">Guardar mi pedido y terminarlo después (copiar link)</button><button type="button" id="clearCart">Vaciar</button></div>
   <form id="f" style="margin-top:20px">
     <label>Nombre y Apellido<input name="nombre" required autocomplete="name"></label>
