@@ -4,21 +4,21 @@
 /* ===== CONFIGURACIÓN (editable) ===== */
 const WA = "50255412293";          // +502 5541 2293
 const CURRENCY = "Q";
-/* price: número en quetzales, o null para "Cotizar".
+/* price: número en quetzales (IVA incluido), o null para "Cotizar". min: pedido mínimo de unidades (opcional).
    photo: foto de la tarjeta, ruta desde la raíz del sitio; vacío = recuadro «Foto próximamente».
    gallery: fotos del detalle (la primera es la principal).  incl: lista «Qué incluye» (vacía = se confirma por WhatsApp). */
 const pics = (id, n) => Array.from({length: n}, (_, i) => `fotos/${id}/${i + 1}.jpg`);
-const PENDING = "Descripción y precio próximamente. Escribinos por chat para cotizar.";
+const PENDING = "Descripción próximamente. Escríbenos por chat para más información.";
 const PRODUCTS = [
-  {id:"single",    name:"The Single",    desc:"Práctica, individual y lista para disfrutar. Cubre 1 persona.",                         price:50,   photo:"fotos/single/card.jpg",    gallery:pics("single",4),    incl:[]},
-  {id:"cozy",      name:"The Cozy",      desc:"Perfecta para compartir en pareja o grupo pequeño. Cubre de 2 a 3 personas.",             price:250,  photo:"fotos/cozy/card.jpg",      gallery:pics("cozy",5),      incl:[]},
-  {id:"homestyle", name:"The Homestyle", desc:"Pensada para reuniones familiares o entre amigos. Cubre de 4 a 6 personas.",               price:450,  photo:"fotos/homestyle/card.jpg", gallery:pics("homestyle",5), incl:[]},
-  {id:"gathering", name:"The Gathering", desc:"Abundante, para encuentros especiales. Cubre de 7 a 10 personas.",                         price:700,  photo:"fotos/gathering/card.jpg", gallery:pics("gathering",5), incl:[]},
-  {id:"little-box",      name:"The Little Box",      desc:PENDING, price:null, photo:"fotos/little-box/card.jpg",      gallery:pics("little-box",3),      incl:[]},
-  {id:"celebration-box", name:"The Celebration Box", desc:PENDING, price:null, photo:"fotos/celebration-box/card.jpg", gallery:pics("celebration-box",4), incl:[]},
-  {id:"mini-dome",       name:"The Mini Dome",       desc:PENDING, price:null, photo:"fotos/mini-dome/card.jpg",       gallery:pics("mini-dome",2),       incl:[]},
-  {id:"big-dome",        name:"The Big Dome",        desc:PENDING, price:null, photo:"fotos/big-dome/card.jpg",        gallery:pics("big-dome",3),        incl:[]},
-  {id:"glass-dome",      name:"The Glass Dome",      desc:PENDING, price:null, photo:"fotos/glass-dome/card.jpg",      gallery:pics("glass-dome",4),      incl:[]},
+  {id:"single",    name:"The Single",    desc:"Práctica, individual y lista para disfrutar. Cubre 1 persona.",                         price:150,   photo:"fotos/single/card.jpg",    gallery:pics("single",4),    incl:[]},
+  {id:"cozy",      name:"The Cozy",      desc:"Perfecta para compartir en pareja o grupo pequeño. Cubre de 2 a 3 personas.",             price:260,  photo:"fotos/cozy/card.jpg",      gallery:pics("cozy",5),      incl:[]},
+  {id:"homestyle", name:"The Homestyle", desc:"Pensada para reuniones familiares o entre amigos. Cubre de 4 a 6 personas.",               price:500,  photo:"fotos/homestyle/card.jpg", gallery:pics("homestyle",5), incl:[]},
+  {id:"gathering", name:"The Gathering", desc:"Abundante, para encuentros especiales. Cubre de 7 a 10 personas.",                         price:800,  photo:"fotos/gathering/card.jpg", gallery:pics("gathering",5), incl:[]},
+  {id:"little-box",      name:"The Little Box",      desc:PENDING, price:65, min:5, photo:"fotos/little-box/card.jpg",      gallery:pics("little-box",3),      incl:[]},
+  {id:"celebration-box", name:"The Celebration Box", desc:PENDING, price:175, min:5, photo:"fotos/celebration-box/card.jpg", gallery:pics("celebration-box",4), incl:[]},
+  {id:"mini-dome",       name:"The Mini Dome",       desc:PENDING, price:30, min:10, photo:"fotos/mini-dome/card.jpg",       gallery:pics("mini-dome",2),       incl:[]},
+  {id:"big-dome",        name:"The Big Dome",        desc:PENDING, price:50, min:10, photo:"fotos/big-dome/card.jpg",        gallery:pics("big-dome",3),        incl:[]},
+  {id:"glass-dome",      name:"The Glass Dome",      desc:PENDING, price:75, min:10, photo:"fotos/glass-dome/card.jpg",      gallery:pics("glass-dome",4),      incl:[]},
   {id:"tailored",  name:"The Tailored",  desc:"Hecha a la medida: ingredientes, cantidades y adaptaciones (sugar free, gluten free, entre otras). El precio varía.", price:null, photo:"", gallery:[], incl:[]}
 ];
 /* ===================================== */
@@ -40,7 +40,8 @@ function cartFromParam(s){
   const o = {};
   (s || "").split(",").forEach(x => {
     const [id, n] = x.split(".");
-    if (PRODUCTS.some(p => p.id === id) && +n > 0) o[id] = Math.min(99, +n | 0);
+    const p = PRODUCTS.find(q => q.id === id);
+    if (p && +n > 0) o[id] = Math.max(p.min || 1, Math.min(99, +n | 0));
   });
   return o;
 }
@@ -52,7 +53,8 @@ function pageUrl(params){
   return location.origin + location.pathname + (q ? "?" + q : "");
 }
 
-const priceTxt = p => p.price ? money(p.price) : "Precio según tu pedido";
+const priceTxt = p => p.price ? money(p.price) + (p.min ? " c/u" : "") : "Precio según tu pedido";
+const minTxt = p => p.min ? `<div class="minq">Pedido mínimo: ${p.min} unidades</div>` : "";
 const titleHtml = n => /^The /.test(n) ? `<span class="ttl"><span class="the" role="img" aria-label="The"></span><span>${esc(n.slice(4))}</span></span>` : esc(n);
 const qtyHtml = p => `<div class="qty"><button type="button" data-chg="${p.id}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><span data-q="${p.id}">0</span><button type="button" data-chg="${p.id}" data-d="1" aria-label="Agregar ${esc(p.name)}">+</button>`;
 
@@ -61,7 +63,7 @@ function cardHtml(p){
     ? `<img src="${ROOT}${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`
     : `<div class="ph">Foto próximamente</div>`;
   return `<div class="card" id="p-${p.id}"><a class="pic" href="?p=${p.id}" data-open="${p.id}" aria-label="Ver detalle de ${esc(p.name)}">${img}</a>
-<div class="b"><h3><a class="tl" href="?p=${p.id}" data-open="${p.id}">${titleHtml(p.name)}</a></h3><p>${esc(p.desc)}</p><div class="price">${priceTxt(p)}</div>
+<div class="b"><h3><a class="tl" href="?p=${p.id}" data-open="${p.id}">${titleHtml(p.name)}</a></h3><p>${esc(p.desc)}</p><div class="price">${priceTxt(p)}</div>${minTxt(p)}
 <a class="more" href="?p=${p.id}" data-open="${p.id}">Ver detalle y fotos</a>
 ${qtyHtml(p)}<button type="button" class="lnk" data-link="${p.id}">Copiar link</button></div></div></div>`;
 }
@@ -80,7 +82,7 @@ ${g.length > 1 ? `<button type="button" class="nav prev" data-gal="-1" aria-labe
     : `<p class="mut">El detalle de lo que incluye lo confirmamos por chat.</p>`;
   return `<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt"><button type="button" class="x" data-close aria-label="Cerrar">×</button>
 <div class="dg">${gal}</div>
-<div class="di"><h2 id="dt">${titleHtml(p.name)}</h2><div class="price">${priceTxt(p)}</div><p>${esc(p.desc)}</p>
+<div class="di"><h2 id="dt">${titleHtml(p.name)}</h2><div class="price">${priceTxt(p)}</div>${minTxt(p)}<p>${esc(p.desc)}</p>
 <h3>Qué incluye</h3>${incl}
 ${qtyHtml(p)}<button type="button" class="lnk" data-link="${p.id}">Copiar link</button></div>
 <a class="btn btn-line2" target="_blank" rel="noopener" href="${wa("Hola Gatherings, quisiera información sobre " + p.name + ".")}">Preguntar por este producto</a>
@@ -129,7 +131,12 @@ function render(){
 }
 
 function change(id, d){
-  cart[id] = Math.max(0, Math.min(99, (cart[id] || 0) + d));
+  const p = PRODUCTS.find(x => x.id === id), min = (p && p.min) || 1, cur = cart[id] || 0;
+  /* con pedido mínimo: «+» desde 0 salta al mínimo y «−» desde el mínimo vuelve a 0 */
+  let n = cur + d;
+  if (d > 0 && n < min) n = min;
+  if (d < 0 && n < min) n = 0;
+  cart[id] = Math.max(0, Math.min(99, n));
   store.set(CART_KEY, cart);
   render();
 }
@@ -163,6 +170,7 @@ function init(){
   /* carrito: el link (?pedido=) manda sobre lo guardado */
   const fromUrl = cartFromParam(params.get("pedido"));
   Object.assign(cart, Object.keys(fromUrl).length ? fromUrl : (store.get(CART_KEY) || {}));
+  PRODUCTS.forEach(p => { if (p.min && cart[p.id] > 0 && cart[p.id] < p.min) cart[p.id] = p.min; });
   store.set(CART_KEY, cart);
 
   /* borrador del formulario */
