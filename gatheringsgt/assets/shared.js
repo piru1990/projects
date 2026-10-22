@@ -148,7 +148,7 @@ function send(e){
   const f = new FormData($("#f")), L = lines();
   const items = L.length ? L.map(x => `• ${x.n} × ${x.p.name}${x.p.price ? " (" + money(x.p.price * x.n) + ")" : " (precio por confirmar)"}`).join("\n") : "• (sin productos: quiero cotizar)";
   const tot = L.length && L.every(x => x.p.price) ? "\nSubtotal tablas: " + money(L.reduce((a,x) => a + x.p.price * x.n, 0)) + " (envío aparte, Q35–Q45)" : "";
-  const t = `Hola Gatherings, quiero hacer un pedido:\n${items}${tot}\n\nNombre: ${f.get("nombre")}\nFecha: ${f.get("fecha")}${f.get("hora") ? " " + f.get("hora") : ""}\nEntrega: ${f.get("entrega")}\nDirección: ${f.get("dir") || "-"}\nNotas: ${f.get("notas") || "-"}`;
+  const t = `Hola Gatherings, quiero hacer un pedido:\n${items}${tot}\n\nNombre: ${f.get("nombre")}\nFecha: ${f.get("fecha")}\nHorario de entrega: ${f.get("horario")}\nDirección: ${f.get("dir") || "-"}\nMensaje personalizado: ${f.get("mensaje") || "-"}\nNotas: ${f.get("notas") || "-"}`;
   window.open(wa(t), "_blank", "noopener");
   return false;
 }

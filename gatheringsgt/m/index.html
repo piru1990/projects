@@ -83,11 +83,11 @@ footer .social svg{width:26px;height:26px}
     <h2>Tú Pedido</h2><p class="sub" id="sum"></p>
     <div class="save" id="saveBox" hidden><button type="button" id="saveLink">Guardar y terminar después (copiar link)</button><button type="button" id="clearCart">Vaciar</button></div>
     <form id="f">
-      <label>Nombre<input name="nombre" required autocomplete="name"></label>
+      <label>Nombre y Apellido<input name="nombre" required autocomplete="name"></label>
       <label>Fecha del evento o entrega<input name="fecha" type="date" required></label>
-      <label>Hora aproximada<input name="hora" type="time"></label>
-      <label>Tipo de entrega<select name="entrega"><option>Entrega a domicilio</option></select></label>
-      <label>Zona y dirección<textarea name="dir" rows="2" placeholder="Zona, colonia, referencias"></textarea></label>
+      <label>Horario de entrega<select name="horario" required><option value="" disabled selected>Elige una opción</option><option>Durante la mañana</option><option>Durante la tarde</option></select></label>
+      <label>Zona y dirección exacta<textarea name="dir" rows="2" placeholder="Zona, colonia, referencias"></textarea></label>
+      <label>Mensaje personalizado (detalla el mensaje especial que quieres que lleve tu producto)<textarea name="mensaje" rows="2"></textarea></label>
       <label>Notas (alergias, personas, ocasión)<textarea name="notas" rows="2"></textarea></label>
       <button class="btn btn-wa btn-ico" type="submit" aria-label="Enviar pedido por WhatsApp">Enviar pedido <svg class="wai" aria-hidden="true"><use href="#wa"/></svg></button>
       <p class="note">No se cobra nada en la página. Tu pedido queda guardado en este teléfono.</p>
@@ -98,7 +98,7 @@ footer .social svg{width:26px;height:26px}
 <div class="cart" id="cart"><b id="cartTxt"></b><a class="btn btn-wa" href="#pedido">Finalizar pedido</a></div>
 <a class="btn btn-wa fab" id="fab" href="#" aria-label="Escribinos por WhatsApp"><svg class="wai" aria-hidden="true"><use href="#wa"/></svg></a>
 <div class="toast" id="toast" role="status"></div>
-<script src="../assets/shared.js"></script>
+<script src="../assets/shared.js?v=20261022b"></script>
 <script src="../assets/analytics.js"></script>
 </body>
 </html>
