@@ -1,7 +1,7 @@
 /* Google Analytics 4 (visitas por región/departamento).
    Pega aquí el ID de medición (G-XXXXXXXXXX). Vacío = no se carga nada. */
 (function(){
-var GA_ID="";
+var GA_ID="G-CMDLKTR9FJ";
 if(!GA_ID)return;
 var KEY="gt_analytics";
 function get(){try{return localStorage.getItem(KEY)}catch(e){return null}}

@@ -21,7 +21,7 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 - Desplegar: Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production.
 
 ## Estadísticas (Google Analytics 4)
-- `assets/analytics.js` carga GA4 en ambas versiones. Está apagado mientras `GA_ID` esté vacío: pega el ID de medición (`G-XXXXXXXXXX`) y redespliega.
+- `assets/analytics.js` carga GA4 en ambas versiones. Usa el ID de medición `G-CMDLKTR9FJ` (constante `GA_ID`); si se deja vacío, queda apagado.
 - Sin señales de publicidad. La primera visita muestra un aviso breve; «No permitir» desactiva la medición en ese navegador (se guarda en `localStorage`, clave `gt_analytics`).
 - Departamento/ciudad: GA4 → Informes → Usuarios → Detalles demográficos → Región / Ciudad. La IP en Guatemala es imprecisa (datos móviles suelen salir como Ciudad de Guatemala).
 
