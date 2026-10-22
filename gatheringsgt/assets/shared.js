@@ -10,16 +10,16 @@ const CURRENCY = "Q";
 const pics = (id, n) => Array.from({length: n}, (_, i) => `fotos/${id}/${i + 1}.jpg`);
 const PENDING = "Descripción próximamente. Escríbenos por chat para más información.";
 const PRODUCTS = [
-  {id:"single",    name:"The Single",    desc:"Práctica, individual y lista para disfrutar. Cubre 1 persona.",                         price:150,   photo:"fotos/single/card.jpg",    gallery:pics("single",4),    incl:[]},
+  {id:"single",    name:"The Single",    desc:"Práctica, individual y lista para disfrutar. Cubre 1 persona.",                         price:150,   photo:"fotos/single/card.jpg",    gallery:pics("single",5),    incl:[]},
   {id:"cozy",      name:"The Cozy",      desc:"Perfecta para compartir en pareja o grupo pequeño. Cubre de 2 a 3 personas.",             price:260,  photo:"fotos/cozy/card.jpg",      gallery:pics("cozy",5),      incl:[]},
   {id:"homestyle", name:"The Homestyle", desc:"Pensada para reuniones familiares o entre amigos. Cubre de 4 a 6 personas.",               price:500,  photo:"fotos/homestyle/card.jpg", gallery:pics("homestyle",5), incl:[]},
   {id:"gathering", name:"The Gathering", desc:"Abundante, para encuentros especiales. Cubre de 7 a 10 personas.",                         price:800,  photo:"fotos/gathering/card.jpg", gallery:pics("gathering",5), incl:[]},
-  {id:"little-box",      name:"The Little Box",      desc:PENDING, price:65, min:5, photo:"fotos/little-box/card.jpg",      gallery:pics("little-box",3),      incl:[]},
+  {id:"little-box",      name:"The Little Box",      desc:PENDING, price:65, min:5, photo:"fotos/little-box/card.jpg",      gallery:pics("little-box",2),      incl:[]},
   {id:"celebration-box", name:"The Celebration Box", desc:PENDING, price:175, min:5, photo:"fotos/celebration-box/card.jpg", gallery:pics("celebration-box",4), incl:[]},
   {id:"mini-dome",       name:"The Mini Dome",       desc:PENDING, price:30, min:10, photo:"fotos/mini-dome/card.jpg",       gallery:pics("mini-dome",2),       incl:[]},
   {id:"big-dome",        name:"The Big Dome",        desc:PENDING, price:50, min:10, photo:"fotos/big-dome/card.jpg",        gallery:pics("big-dome",3),        incl:[]},
-  {id:"glass-dome",      name:"The Glass Dome",      desc:PENDING, price:75, min:10, photo:"fotos/glass-dome/card.jpg",      gallery:pics("glass-dome",4),      incl:[]},
-  {id:"tailored",  name:"The Tailored",  desc:"Hecha a la medida: ingredientes, cantidades y adaptaciones (sugar free, gluten free, entre otras). El precio varía.", price:null, photo:"", gallery:[], incl:[]}
+  {id:"glass-dome",      name:"The Glass Dome",      desc:PENDING, price:75, min:10, photo:"fotos/glass-dome/card.jpg",      gallery:pics("glass-dome",3),      incl:[]},
+  {id:"tailored",  name:"The Tailored",  desc:"Hecha a la medida: ingredientes, cantidades y adaptaciones (sugar free, gluten free, entre otras). El precio varía.", price:null, photo:"fotos/tailored/card.jpg", gallery:pics("tailored",5), incl:[]}
 ];
 /* ===================================== */
 
