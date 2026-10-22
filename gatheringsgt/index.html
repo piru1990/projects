@@ -46,7 +46,6 @@ section h2{font-size:30px;color:var(--navy);text-align:center;margin-bottom:6px}
 #pedido h2,#pedido .sub{color:#fff}
 #pedido .save button{color:var(--mint)}
 #pedido form{background:#fff;border-radius:18px;padding:26px;margin-top:22px}
-.alt{background:var(--cream) url(assets/brand/fondo-romero-gris.webp) center/cover}
 .sub{text-align:center;color:var(--mut);margin:0 auto 32px;max-width:560px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
@@ -59,9 +58,6 @@ section h2{font-size:30px;color:var(--navy);text-align:center;margin-bottom:6px}
 .qty{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:8px}
 .qty button{width:34px;height:34px;border-radius:50%;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:18px;cursor:pointer}
 .qty span{min-width:20px;text-align:center;font:600 16px var(--sans)}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;counter-reset:s}
-.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
-.step:before{counter-increment:s;content:counter(s);display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;align-items:center;justify-content:center;font:600 14px var(--sans);margin-bottom:8px}
 form{display:grid;gap:12px;max-width:560px;margin:0 auto}
 label{font:600 13px var(--sans);color:var(--navy);display:grid;gap:4px}
 input,select,textarea{font:16px var(--sans);padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%}
@@ -104,17 +100,6 @@ footer .social svg{width:24px;height:24px}
   <p class="sub">Todas las tablas incluyen una selección de quesos y jamones premium, acompañamientos gourmet y detalles hechos en casa. Armá tu pedido y mandalo por chat.</p>
   <div class="grid" id="grid"></div>
   <p class="note" style="margin-top:20px">Envío: Q35 – Q45, no incluido en el precio de las tablas.</p>
-</div></section>
-
-<section class="alt" id="como"><div class="wrap">
-  <img class="eyebrow" src="assets/brand/the-moment-azul.png" alt="The Moment" width="186" height="44">
-  <h2>Cómo pedir</h2><p class="sub">Todo se coordina por chat.</p>
-  <div class="steps">
-    <div class="step"><h3>Elegí</h3><p>Agregá las tablas que querés y la cantidad de personas.</p></div>
-    <div class="step"><h3>Completá tu pedido</h3><p>Fecha, zona y dirección de entrega (el envío cuesta Q35 – Q45).</p></div>
-    <div class="step"><h3>Enviá tu pedido</h3><p>Se abre el chat con tu pedido ya escrito.</p></div>
-    <div class="step"><h3>Confirmamos</h3><p>Te respondemos con el total, el envío y el horario.</p></div>
-  </div>
 </div></section>
 
 <section id="pedido"><div class="wrap">
