@@ -4,16 +4,20 @@ Sitio estático sin dependencias, alojado en Cloudflare Pages (proyecto `gatheri
 
 - `index.html`: versión de escritorio. En teléfono redirige a `/m/`.
 - `m/index.html`: versión móvil ligera (una columna, sin hero ni navegación). En pantalla ancha redirige a `/`.
-- `assets/shared.js`: productos (`PRODUCTS`), carrito y envío por WhatsApp, compartidos por ambas versiones.
+- `assets/shared.js`: productos (`PRODUCTS`), carrito, detalle de producto y envío por WhatsApp, compartidos por ambas versiones.
+- `assets/detail.css`: estilos de la ventana de detalle de producto.
+- `fotos/<producto>/`: fotos oficiales (JOBS-159). `card.jpg` es la de la tarjeta (4:3) y `1.jpg`, `2.jpg`… la galería del detalle.
 
 La persona puede forzar una versión con el link «Ver versión móvil / de escritorio» (queda guardada en el navegador).
 
 ## Links
-- Producto directo: `/?p=cozy` (o `/m/?p=cozy`); resalta el producto. Cada tarjeta tiene «Copiar link».
+- Producto directo: `/?p=cozy` (o `/m/?p=cozy`); abre el detalle del producto con su galería. Cada tarjeta y cada detalle tienen «Copiar link».
+- Tocar la foto, el nombre o «Ver detalle y fotos» de una tarjeta abre el detalle (el botón Atrás o Esc lo cierra).
 - Pedido guardado: `/?pedido=cozy.2,single.1`; restaura el carrito en cualquier dispositivo. El carrito y el borrador del formulario también se guardan en el navegador.
 
 ## Cómo editar y redesplegar
-- Productos, precios y fotos: constante `PRODUCTS` en `assets/shared.js` (`photo` es una ruta desde la raíz, p. ej. `fotos/cozy.jpg`).
+- Productos, precios, descripciones y fotos: constante `PRODUCTS` en `assets/shared.js`. `photo` es la foto de la tarjeta, `gallery` las fotos del detalle (`pics("cozy",5)` = `fotos/cozy/1.jpg`…`5.jpg`) e `incl` la lista de «Qué incluye» (vacía = «lo confirmamos por WhatsApp»).
+- Pendiente (JOBS-159): precio, descripción y «Qué incluye» de The Little Box, The Celebration Box, The Mini Dome, The Big Dome y The Glass Dome; hoy se cotizan por WhatsApp. Las fotos se prepararon a 1200 px y menos de ~150 KB desde la carpeta «Photos gatherings.com».
 - Desplegar: Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production.
 
 ## Línea gráfica (JOBS-156)
