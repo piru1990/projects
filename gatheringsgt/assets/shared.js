@@ -53,6 +53,7 @@ function pageUrl(params){
 }
 
 const priceTxt = p => p.price ? money(p.price) : "Precio según tu pedido";
+const titleHtml = n => /^The /.test(n) ? `<span class="ttl"><span class="the" role="img" aria-label="The"></span><span>${esc(n.slice(4))}</span></span>` : esc(n);
 const qtyHtml = p => `<div class="qty"><button type="button" data-chg="${p.id}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><span data-q="${p.id}">0</span><button type="button" data-chg="${p.id}" data-d="1" aria-label="Agregar ${esc(p.name)}">+</button>`;
 
 function cardHtml(p){
@@ -60,7 +61,7 @@ function cardHtml(p){
     ? `<img src="${ROOT}${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`
     : `<div class="ph">Foto próximamente</div>`;
   return `<div class="card" id="p-${p.id}"><a class="pic" href="?p=${p.id}" data-open="${p.id}" aria-label="Ver detalle de ${esc(p.name)}">${img}</a>
-<div class="b"><h3><a class="tl" href="?p=${p.id}" data-open="${p.id}">${esc(p.name)}</a></h3><p>${esc(p.desc)}</p><div class="price">${priceTxt(p)}</div>
+<div class="b"><h3><a class="tl" href="?p=${p.id}" data-open="${p.id}">${titleHtml(p.name)}</a></h3><p>${esc(p.desc)}</p><div class="price">${priceTxt(p)}</div>
 <a class="more" href="?p=${p.id}" data-open="${p.id}">Ver detalle y fotos</a>
 ${qtyHtml(p)}<button type="button" class="lnk" data-link="${p.id}">Copiar link</button></div></div></div>`;
 }
@@ -79,7 +80,7 @@ ${g.length > 1 ? `<button type="button" class="nav prev" data-gal="-1" aria-labe
     : `<p class="mut">El detalle de lo que incluye lo confirmamos por chat.</p>`;
   return `<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt"><button type="button" class="x" data-close aria-label="Cerrar">×</button>
 <div class="dg">${gal}</div>
-<div class="di"><h2 id="dt">${esc(p.name)}</h2><div class="price">${priceTxt(p)}</div><p>${esc(p.desc)}</p>
+<div class="di"><h2 id="dt">${titleHtml(p.name)}</h2><div class="price">${priceTxt(p)}</div><p>${esc(p.desc)}</p>
 <h3>Qué incluye</h3>${incl}
 ${qtyHtml(p)}<button type="button" class="lnk" data-link="${p.id}">Copiar link</button></div>
 <a class="btn btn-line2" target="_blank" rel="noopener" href="${wa("Hola Gatherings, quisiera información sobre " + p.name + ".")}">Preguntar por este producto</a>
