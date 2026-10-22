@@ -8,7 +8,7 @@ const CURRENCY = "Q";
    photo: foto de la tarjeta, ruta desde la raíz del sitio; vacío = recuadro «Foto próximamente».
    gallery: fotos del detalle (la primera es la principal).  incl: lista «Qué incluye» (vacía = se confirma por WhatsApp). */
 const pics = (id, n) => Array.from({length: n}, (_, i) => `fotos/${id}/${i + 1}.jpg`);
-const PENDING = "Descripción y precio próximamente. Escribinos por WhatsApp para cotizar.";
+const PENDING = "Descripción y precio próximamente. Escribinos por chat para cotizar.";
 const PRODUCTS = [
   {id:"single",    name:"The Single",    desc:"Práctica, individual y lista para disfrutar. Cubre 1 persona.",                         price:50,   photo:"fotos/single/card.jpg",    gallery:pics("single",4),    incl:[]},
   {id:"cozy",      name:"The Cozy",      desc:"Perfecta para compartir en pareja o grupo pequeño. Cubre de 2 a 3 personas.",             price:250,  photo:"fotos/cozy/card.jpg",      gallery:pics("cozy",5),      incl:[]},
@@ -76,7 +76,7 @@ ${g.length > 1 ? `<button type="button" class="nav prev" data-gal="-1" aria-labe
     : `<div class="gal ph0"><div class="ph">Foto próximamente</div></div>`;
   const incl = p.incl && p.incl.length
     ? `<ul>${p.incl.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`
-    : `<p class="mut">El detalle de lo que incluye lo confirmamos por WhatsApp.</p>`;
+    : `<p class="mut">El detalle de lo que incluye lo confirmamos por chat.</p>`;
   return `<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt"><button type="button" class="x" data-close aria-label="Cerrar">×</button>
 <div class="dg">${gal}</div>
 <div class="di"><h2 id="dt">${esc(p.name)}</h2><div class="price">${priceTxt(p)}</div><p>${esc(p.desc)}</p>
