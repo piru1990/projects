@@ -30,6 +30,6 @@ Recursos de marca en `assets/brand/` (optimizados a partir de la carpeta «Fotos
 - Paleta: azul `#031666`, verde claro `#AFDCBF`, verde `#4EB969`, gris `#EBEBEB` (variables CSS al inicio de cada página).
 - Tipografías de marca: Rossten (títulos) y Gotham Narrow (apoyo). Son fuentes con licencia que no están en el repo: las páginas las piden por nombre y, si no están instaladas, usan Georgia y la fuente del sistema. Para activarlas, agregar los archivos `.woff2` en `assets/fonts/` y declarar `@font-face`.
 - `logo-blanco.png`: logo sobre azul (encabezado y portada). `the-azul.png`: isotipo THE (recuadro de «Foto próximamente»). `romero-azul.png`: ramita de romero (pie). `icon-the.png` y `favicon.png`: ícono. `og.jpg`: imagen al compartir el link.
-- Fondos: `fondo-the-azul.webp` (portada y pedido), `fondo-romero-verde.webp` (menú), `fondo-romero-gris.webp` (cómo pedir y fondo móvil).
+- Fondos: `fondo-the-azul.webp` (pedido; la portada y el menú van en color sólido), `fondo-romero-gris.webp` (cómo pedir y fondo móvil).
 - Identidades visuales como encabezados: `the-board-*` (menú), `the-moment-*` (cómo pedir, y pedido en móvil), `the-sharing-*` (pedido en escritorio).
 - «Artisan Charcuterie Boards» ya no se usa en el sitio.
