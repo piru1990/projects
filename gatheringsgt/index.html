@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es" data-root="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gatherings GT · Tablas de charcutería y grazing tables</title>
+<meta name="description" content="Tablas de charcutería artesanales y grazing tables para eventos, reuniones y momentos especiales en Guatemala. Pedí por WhatsApp.">
+<meta property="og:title" content="Gatherings GT">
+<meta property="og:description" content="Tablas de charcutería y grazing tables en Guatemala. Pedí por WhatsApp.">
+<meta property="og:image" content="https://gatheringsgt.com/assets/brand/og.jpg">
+<link rel="icon" type="image/png" href="assets/brand/favicon.png">
+<link rel="apple-touch-icon" href="assets/brand/icon-the.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#031666">
+<script>
+/* Escritorio (/): en teléfono manda a /m/ salvo que la persona haya elegido la versión de escritorio (?v=d). */
+(function(){try{var q=new URLSearchParams(location.search),v=q.get("v");if(v){localStorage.setItem("gt_view",v);}else{v=localStorage.getItem("gt_view");}
+if(v!=="d"&&(v==="m"||(!v&&(/Android|iPhone|iPod|Mobile/i.test(navigator.userAgent)||innerWidth<=768))))location.replace("m/"+location.search.replace(/[?&]v=[^&]*/,"").replace(/^&/,"?")+location.hash)}catch(e){}})();
+</script>
+<style>
+:root{--navy:#031666;--navy-d:#020f47;--mint:#AFDCBF;--green:#4EB969;--cream:#EBEBEB;--ink:#1c1c28;--mut:#5d6170;--line:#cfe3d6;--wa:var(--green);
+--serif:"Rossten",Georgia,"Times New Roman",serif;--sans:"Gotham Narrow","Gotham",system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.55 var(--serif);color:var(--ink);background:var(--cream)}
+h1,h2,h3{font-weight:400;letter-spacing:.02em;margin:0}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header{background:var(--navy);color:#fff;position:sticky;top:0;z-index:5}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+header .brand{display:block;line-height:0}
+header .brand img{height:40px;width:auto}
+header nav a{margin-left:18px;text-decoration:none;font:13px var(--sans);letter-spacing:.08em;text-transform:uppercase;opacity:.9}
+.hero{background:var(--navy) url(assets/brand/fondo-the-azul.webp) center/cover;color:#fff;text-align:center;padding:84px 16px 92px}
+.hero h1{line-height:0}
+.hero h1 img{width:min(560px,86vw);height:auto}
+.hero p{max-width:560px;margin:22px auto 0;opacity:.92}
+.btn{display:inline-block;border:0;border-radius:999px;padding:13px 26px;font:700 15px var(--sans);cursor:pointer;text-decoration:none}
+.btn-wa{background:var(--wa);color:var(--navy)}.btn-line{border:1px solid #fff;color:#fff;margin-left:8px}
+.hero .btns{margin-top:28px}
+section{padding:64px 0}
+section h2{font-size:30px;color:var(--navy);text-align:center;margin-bottom:6px}
+.eyebrow{display:block;margin:0 auto 10px;height:44px;width:auto;max-width:80%}
+#menu{background:var(--mint) url(assets/brand/fondo-romero-verde.webp) center/cover}
+#pedido{background:var(--navy) url(assets/brand/fondo-the-azul.webp) center/cover}
+#pedido h2,#pedido .sub{color:#fff}
+#pedido .save button{color:var(--mint)}
+#pedido form{background:#fff;border-radius:18px;padding:26px;margin-top:22px}
+.alt{background:var(--cream) url(assets/brand/fondo-romero-gris.webp) center/cover}
+.sub{text-align:center;color:var(--mut);margin:0 auto 32px;max-width:560px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.ph{aspect-ratio:4/3;background:var(--mint) url(assets/brand/the-azul.png) center 40%/32% no-repeat;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px;color:var(--navy);opacity:.9;font:12px var(--sans);letter-spacing:.15em;text-transform:uppercase}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.card.hl{outline:3px solid var(--green);outline-offset:2px}
+.card .b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:19px;color:var(--navy)}
+.card p{margin:0;color:var(--mut);font-size:14px}
+.price{font:700 15px var(--sans)}
+.qty{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:8px}
+.qty button{width:34px;height:34px;border-radius:50%;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:18px;cursor:pointer}
+.qty span{min-width:20px;text-align:center;font:600 16px var(--sans)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;counter-reset:s}
+.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+.step:before{counter-increment:s;content:counter(s);display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;align-items:center;justify-content:center;font:600 14px var(--sans);margin-bottom:8px}
+form{display:grid;gap:12px;max-width:560px;margin:0 auto}
+label{font:600 13px var(--sans);color:var(--navy);display:grid;gap:4px}
+input,select,textarea{font:16px var(--sans);padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row{grid-template-columns:1fr}header nav a:not(:last-child){display:none}}
+.note{font:13px var(--sans);color:var(--mut);text-align:center}
+footer{background:var(--mint);color:var(--navy);text-align:center;padding:40px 16px 32px;font:14px var(--sans)}
+footer img{height:64px;width:auto;margin-bottom:10px}
+footer a{color:var(--navy);font-weight:700}
+.cart{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:12px;z-index:6;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+.cart.on{display:flex}.cart b{font:600 15px var(--sans)}
+.fab{position:fixed;right:16px;bottom:16px;z-index:4}
+.cart.on~.fab{display:none}
+
+.qty .lnk{width:auto;height:auto;border:0;background:none;border-radius:0;font:13px var(--sans);color:var(--mut);text-decoration:underline;margin-left:auto}
+.save{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.save button{background:none;border:0;font:13px var(--sans);color:var(--navy);text-decoration:underline;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;font:14px var(--sans);opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.viewsw{color:var(--navy);font:13px var(--sans)}</style>
+</head>
+<body>
+<header><div class="wrap"><a class="brand" href="#top"><img src="assets/brand/logo-blanco.png" alt="Gatherings" width="139" height="40"></a><nav><a href="#menu">Menú</a><a href="#como">Cómo pedir</a><a href="#pedido">Pedir</a></nav></div></header>
+
+<div class="hero" id="top">
+  <h1><img src="assets/brand/logo-blanco.png" alt="Gatherings" width="560" height="161"></h1>
+  <p>Para eventos, reuniones y momentos especiales. Tablas hechas a mano, entregadas en Guatemala.</p>
+  <div class="btns"><a class="btn btn-wa" href="#menu">Ver el menú</a><a class="btn btn-line" id="waTop" href="#">Escribinos por WhatsApp</a></div>
+</div>
+
+<section id="menu"><div class="wrap">
+  <img class="eyebrow" src="assets/brand/the-board-azul.png" alt="The Board" width="160" height="44">
+  <h2>El menú</h2>
+  <p class="sub">Todas las tablas incluyen una selección de quesos y jamones premium, acompañamientos gourmet y detalles hechos en casa. Armá tu pedido y mandalo por WhatsApp.</p>
+  <div class="grid" id="grid"></div>
+  <p class="note" style="margin-top:20px">Envío: Q35 – Q45, no incluido en el precio de las tablas.</p>
+</div></section>
+
+<section class="alt" id="como"><div class="wrap">
+  <img class="eyebrow" src="assets/brand/the-moment-azul.png" alt="The Moment" width="186" height="44">
+  <h2>Cómo pedir</h2><p class="sub">Todo se coordina por WhatsApp.</p>
+  <div class="steps">
+    <div class="step"><h3>Elegí</h3><p>Agregá las tablas que querés y la cantidad de personas.</p></div>
+    <div class="step"><h3>Completá tu pedido</h3><p>Fecha, zona y dirección de entrega (el envío cuesta Q35 – Q45).</p></div>
+    <div class="step"><h3>Enviá por WhatsApp</h3><p>Se abre el chat con tu pedido ya escrito.</p></div>
+    <div class="step"><h3>Confirmamos</h3><p>Te respondemos con el total, el envío y el horario.</p></div>
+  </div>
+</div></section>
+
+<section id="pedido"><div class="wrap">
+  <img class="eyebrow" src="assets/brand/the-sharing-verde-claro.png" alt="The Art of Sharing" width="280" height="44" style="height:auto;width:min(280px,80%)">
+  <h2>Tu pedido</h2><p class="sub" id="sum"></p>
+  <div class="save" id="saveBox" hidden><button type="button" id="saveLink">Guardar mi pedido y terminarlo después (copiar link)</button><button type="button" id="clearCart">Vaciar</button></div>
+  <form id="f" style="margin-top:20px">
+    <label>Nombre<input name="nombre" required autocomplete="name"></label>
+    <div class="row">
+      <label>Fecha del evento o entrega<input name="fecha" type="date" required></label>
+      <label>Hora aproximada<input name="hora" type="time"></label>
+    </div>
+    <label>Tipo de entrega
+      <select name="entrega"><option>Entrega a domicilio</option></select></label>
+    <label>Zona y dirección<textarea name="dir" rows="2" placeholder="Zona, colonia, referencias"></textarea></label>
+    <label>Notas (alergias, número de personas, ocasión)<textarea name="notas" rows="2"></textarea></label>
+    <button class="btn btn-wa" type="submit">Enviar pedido por WhatsApp</button>
+    <p class="note">No se cobra nada en la página: el envío y el pago se acuerdan por WhatsApp. Tu pedido queda guardado en este navegador.</p>
+  </form>
+</div></section>
+
+<footer>
+  <img src="assets/brand/romero-azul.png" alt="" width="54" height="64">
+  <p><b>Gatherings GT</b> · Guatemala · <a id="waFoot" href="#">+502 5541 2293</a> · <a href="https://www.instagram.com/gatheringsgt/" target="_blank" rel="noopener">@gatheringsgt</a></p>
+  <p><a class="viewsw" href="m/?v=m">Ver versión móvil</a></p>
+</footer>
+
+<div class="cart" id="cart"><b id="cartTxt"></b><a class="btn btn-wa" href="#pedido">Finalizar pedido</a></div>
+<a class="btn btn-wa fab" id="fab" href="#">WhatsApp</a>
+<div class="toast" id="toast" role="status"></div>
+<script src="assets/shared.js"></script>
+</body>
+</html>
