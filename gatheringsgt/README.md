@@ -30,7 +30,7 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 ## Línea gráfica (JOBS-156)
 Recursos de marca en `assets/brand/` (optimizados a partir de la carpeta «Fotos Webpage» / Gatherings Visual Identity):
 - Paleta: azul `#031666`, verde claro `#AFDCBF`, verde `#4EB969`, gris `#EBEBEB` (variables CSS al inicio de cada página).
-- Tipografías de marca: Rossten (títulos) y Gotham Narrow (apoyo). Son fuentes con licencia que no están en el repo: las páginas las piden por nombre y, si no están instaladas, usan Georgia y la fuente del sistema. Para activarlas, agregar los archivos `.woff2` en `assets/fonts/` y declarar `@font-face`.
+- Tipografías de marca: Rossten (títulos, `assets/fonts/rossten.woff2`, convertida del .otf que pasó Allan) y Gotham Narrow (texto de apoyo). Gotham Narrow es de pago; mientras tanto el sitio usa **Barlow Semi Condensed** (licencia OFL, `assets/fonts/LICENSE-Barlow-OFL.txt`) declarada con el nombre «Gotham Narrow» en el `@font-face` de cada página: para usar la original basta reemplazar los tres `gotham-narrow-*.woff2` (400, 600 y 700). El archivo «Gotham Narrow XLight» de OnlineWebFonts es cursiva (−12°) y delgadísimo, por eso no se usó (además exige crédito CC BY 4.0).
 - `logo-blanco.png`: logo sobre azul (encabezado y portada). `the-azul.png`: isotipo THE (recuadro de «Foto próximamente»). `romero-azul.png`: ramita de romero (pie). `icon-the.png` y `favicon.png`: ícono. `og.jpg`: imagen al compartir el link.
 - Fondos: `fondo-the-azul.webp` (pedido; la portada y el menú van en color sólido), `fondo-romero-gris.webp` (cómo pedir y fondo móvil).
 - Identidades visuales como encabezados: `the-board-*` (menú), `the-moment-*` (cómo pedir, y pedido en móvil), `the-sharing-*` (pedido en escritorio).

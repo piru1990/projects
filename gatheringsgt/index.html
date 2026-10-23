@@ -18,6 +18,12 @@
 if(v!=="d"&&(v==="m"||(!v&&(/Android|iPhone|iPod|Mobile/i.test(navigator.userAgent)||innerWidth<=768))))location.replace("m/"+location.search.replace(/[?&]v=[^&]*/,"").replace(/^&/,"?")+location.hash)}catch(e){}})();
 </script>
 <style>
+/* Rossten: fuente de marca (assets/fonts/rossten.woff2). «Gotham Narrow»: por ahora Barlow Semi Condensed (OFL) con ese nombre;
+   para usar la Gotham Narrow original basta reemplazar los tres gotham-narrow-*.woff2. */
+@font-face{font-family:"Rossten";src:url(assets/fonts/rossten.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Gotham Narrow";src:url(assets/fonts/gotham-narrow-400.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Gotham Narrow";src:url(assets/fonts/gotham-narrow-600.woff2) format("woff2");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Gotham Narrow";src:url(assets/fonts/gotham-narrow-700.woff2) format("woff2");font-weight:700;font-style:normal;font-display:swap}
 :root{--navy:#031666;--navy-d:#020f47;--mint:#AFDCBF;--green:#4EB969;--cream:#EBEBEB;--ink:#1c1c28;--mut:#5d6170;--line:#cfe3d6;--wa:var(--green);
 --serif:"Rossten",Georgia,"Times New Roman",serif;--sans:"Gotham Narrow","Gotham",system-ui,-apple-system,"Segoe UI",sans-serif}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
