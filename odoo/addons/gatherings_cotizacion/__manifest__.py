@@ -12,6 +12,7 @@
     "data": [
         "views/product_views.xml",
         "views/sale_order_views.xml",
+        "views/res_company_views.xml",
         "views/report_templates.xml",
         "data/mail_template_data.xml",
     ],

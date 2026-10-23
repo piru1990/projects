@@ -122,6 +122,16 @@ class TestWebQuote(TransactionCase):
         self.assertIn("Total (IVA incluido)", html)
         self.assertIn("The Cozy", html)
 
+    def test_texto_de_pago_editable(self):
+        self.env.company.gt_pago_texto = "Anticipo del 50 %\nDepósito Banco X, cuenta 123"
+        r = self.Order.gt_web_quote(self.pedido([{"id": "cozy", "qty": 1}]))
+        orden = self.Order.search([("name", "=", r["cotizacion"])])
+        html = self.env["ir.actions.report"]._render_qweb_html("gatherings_cotizacion.report_cotizacion", orden.ids)[0].decode()
+        self.assertIn("Anticipo del 50 %", html)
+        self.assertIn("Depósito Banco X", html)
+        cuerpo = self.env.ref("gatherings_cotizacion.mail_template_cotizacion")._render_field("body_html", orden.ids)[orden.id]
+        self.assertIn("Depósito Banco X", cuerpo)
+
     def test_limite_por_correo(self):
         for _ in range(5):
             self.assertTrue(self.Order.gt_web_quote(self.pedido([{"id": "single", "qty": 1}]))["ok"])

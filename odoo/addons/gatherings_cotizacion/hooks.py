@@ -4,6 +4,7 @@ import logging
 from odoo.tools import file_open
 
 from . import catalogo
+from .models.res_company import PAGO_POR_DEFECTO
 
 _logger = logging.getLogger(__name__)
 
@@ -56,6 +57,7 @@ def _marca(env):
         "secondary_color": "#4EB969",
         "report_footer": PIE,
         **({} if company.email else {"email": "hola@gatheringsgt.com"}),   # remitente de los correos y destino de los avisos
+        **({} if company.gt_pago_texto else {"gt_pago_texto": PAGO_POR_DEFECTO}),
         **({} if company.company_details else {"company_details": "<p>Gatherings GT<br/>hola@gatheringsgt.com</p>"}),
         "layout_background": "Blank",
         "external_report_layout_id": env.ref("web.external_layout_standard").id,
