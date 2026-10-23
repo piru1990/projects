@@ -34,7 +34,7 @@
           </tr>
         </table>
         <p style="margin:10px 0 0 0;font-size:14px;">Envío a domicilio: Q35–Q45 según la zona, se confirma aparte.<t t-if="object.validity_date"> Cotización válida hasta el <t t-out="format_date(object.validity_date, date_format='dd/MM/yyyy')"/>.</t></p>
-        <p style="margin:18px 0 0 0;">Para confirmar tu pedido se requiere un anticipo. Responde a este correo o escríbenos por WhatsApp y te indicamos cómo realizarlo.</p>
+        <p style="margin:18px 0 0 0;white-space:pre-line;"><t t-out="object.company_id.gt_pago_texto or 'Para confirmar tu pedido se requiere un anticipo. Escríbenos y te indicamos cómo realizarlo.'"/></p>
       </td></tr>
       <tr><td align="center" style="padding:20px 28px 28px 28px;">
         <a href="https://wa.me/50255412293" style="display:inline-block;background-color:#4EB969;color:#031666;text-decoration:none;font-weight:bold;padding:12px 24px;font-size:16px;">Escribir por WhatsApp</a>

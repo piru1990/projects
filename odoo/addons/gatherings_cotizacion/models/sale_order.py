@@ -203,18 +203,29 @@ class SaleOrder(models.Model):
         return f"{base}/odoo/action-sale.action_quotations_with_onboarding/{self.id}"
 
     def _gt_avisar_revision(self):
-        """Actividad para el responsable y correo a la dirección de la compañía: la cotización espera revisión."""
+        """Actividad para el responsable y correo a la dirección de la compañía: la cotización espera revisión.
+        Los avisos nunca deben tumbar la solicitud (la cotización ya existe): cada uno falla por separado y queda en el log."""
         self.ensure_one()
         usuario = self.env.ref("base.user_admin", raise_if_not_found=False)
         if usuario:
-            self.activity_schedule(
-                "mail.mail_activity_data_todo", summary="Revisar y enviar cotización del sitio web",
-                note=escape(self.gt_revision or ""), user_id=usuario.id)
+            try:
+                with self.env.cr.savepoint():
+                    # mail_activity_quick_update: sin el correo «te asignaron una actividad», que Odoo no puede firmar con el
+                    # usuario técnico (no tiene correo); el aviso por correo va aparte, a la dirección de la compañía.
+                    self.with_context(mail_activity_quick_update=True).activity_schedule(
+                        "mail.mail_activity_data_todo", summary="Revisar y enviar cotización del sitio web",
+                        note=escape(self.gt_revision or ""), user_id=usuario.id)
+            except Exception:
+                _logger.exception("No se pudo crear la actividad de revisión de %s", self.name)
         destino = self.company_id.email
         if destino:
-            cuerpo = Markup("<p>Hay una cotización del sitio web por revisar: <b>{}</b> ({}).</p><p>{}</p><p><a href=\"{}\">Abrir en Odoo</a></p>").format(
-                self.name, self.partner_id.name, (self.gt_revision or "").replace("\n", " "), self._gt_url())
-            self.env["mail.mail"].sudo().create({
-                "subject": f"Cotización web por revisar: {self.name}", "body_html": cuerpo, "email_to": destino,
-                "email_from": destino, "auto_delete": True,
-            }).send(raise_exception=False)
+            try:
+                with self.env.cr.savepoint():
+                    cuerpo = Markup("<p>Hay una cotización del sitio web por revisar: <b>{}</b> ({}).</p><p>{}</p><p><a href=\"{}\">Abrir en Odoo</a></p>").format(
+                        self.name, self.partner_id.name, (self.gt_revision or "").replace("\n", " "), self._gt_url())
+                    self.env["mail.mail"].sudo().create({
+                        "subject": f"Cotización web por revisar: {self.name}", "body_html": cuerpo, "email_to": destino,
+                        "email_from": destino, "auto_delete": True,
+                    }).send(raise_exception=False)
+            except Exception:
+                _logger.exception("No se pudo avisar por correo de la revisión de %s", self.name)

@@ -28,7 +28,7 @@ Si Odoo no responde, el sitio muestra un enlace a WhatsApp con el pedido (el cli
 1. Traer el código (`git pull` de `main`) y hacer respaldo: `odoo/scripts/backup.sh`.
 2. Desde `odoo/`: `docker compose run --rm odoo odoo -d gatherings -i gatherings_cotizacion --stop-after-init` y `docker compose restart odoo`.
 3. `./scripts/setup_cotizaciones.sh` crea el usuario técnico `web-cotizaciones` (Ventas + crear contactos, sin acceso a Ajustes) y muestra su llave API **una vez**. Es el secreto `ODOO_API_KEY` de Cloudflare Pages; no se sube al repo ni se pega en chats.
-4. Revisar en Odoo: Ajustes → Compañías (logo, correo hola@), un producto (pestaña «Sitio web y cotizaciones»), y que `hola@` siga enviando.
+4. Revisar en Odoo: Ajustes → Compañías (logo y **Correo = hola@gatheringsgt.com**: es el remitente de las cotizaciones y el destino de los avisos de revisión; sin él los correos no salen y las cotizaciones quedan en borrador), un producto (pestaña «Sitio web y cotizaciones»), y que `hola@` siga enviando.
 
 ## Cloudflare
 - **Access** (Zero Trust → Access → Service credentials): crear un Service Token «sitio-cotizaciones» y agregar a la aplicación de erp.gatheringsgt.com una política **Service Auth** que lo incluya (la política «Solo Allan y Andrea» no cambia).
@@ -40,6 +40,7 @@ Si Odoo no responde, el sitio muestra un enlace a WhatsApp con el pedido (el cli
 
 ## Operación
 - «Ventas → Cotizaciones → filtro *Por revisar (sitio web)*»: lo que espera a Andrea; el motivo está en la pestaña de la cotización y en la actividad.
+- Anticipo y formas de pago: Ajustes → Compañías → campo «Anticipo y forma de pago (cotizaciones)»; el texto (cada línea tal cual) va al final del PDF y del correo. Se edita sin tocar código.
 - Para cambiar un precio o mínimo: editar el producto en Odoo **y** `catalogo.py`, `assets/shared.js` y `_worker.js` (el test avisa si quedan distintos). Que un producto pase por revisión se cambia en el producto («Cotización web»).
 - Límites contra abuso: 5 solicitudes por correo al día; más de 30 por hora en total quedan en borrador sin correos al cliente (`catalogo.py`).
 - Gotham Narrow original: reemplazar solo `static/fonts/gotham-narrow-*.ttf`.

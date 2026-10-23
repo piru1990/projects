@@ -81,8 +81,7 @@
                     <p t-if="doc.validity_date and doc.state in ['draft', 'sent']">
                         Esta cotización es válida hasta el <span t-field="doc.validity_date" t-options='{"format": "dd/MM/yyyy"}'/>. Los precios incluyen IVA.
                     </p>
-                    <p>Para confirmar tu pedido se requiere un anticipo. Respóndenos a este correo o escríbenos por WhatsApp y te
-                        indicamos cómo realizarlo.</p>
+                    <p style="white-space: pre-line;"><t t-out="doc.company_id.gt_pago_texto or 'Para confirmar tu pedido se requiere un anticipo. Escríbenos y te indicamos cómo realizarlo.'"/></p>
                 </div>
             </div>
         </t>
