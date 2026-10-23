@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Los correos no llevan enlaces al portal de Odoo (está detrás de Cloudflare Access) ni imágenes de erp.gatheringsgt.com:
+         el logo se carga desde el sitio público. Colores de la marca: azul #031666, menta #AFDCBF, verde #4EB969. -->
+    <data noupdate="0">
+        <record id="mail_template_cotizacion" model="mail.template">
+            <field name="name">Cotización del sitio web (Gatherings)</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Tu cotización de Gatherings {{ object.name }}</field>
+            <field name="email_from">{{ object.company_id.email_formatted or user.email_formatted }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="report_template_ids" eval="[(4, ref('gatherings_cotizacion.action_report_cotizacion'))]"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background-color:#EBEBEB;font-family:'Gotham Narrow','Barlow Semi Condensed',Arial,sans-serif;color:#031666;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#EBEBEB;"><tr><td align="center" style="padding:24px 12px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;">
+      <tr><td align="center" style="background-color:#031666;padding:24px;">
+        <img src="https://gatheringsgt.com/assets/brand/logo-blanco.png" alt="Gatherings" width="220" style="display:block;border:0;height:auto;max-width:220px;"/>
+      </td></tr>
+      <tr><td style="padding:28px 28px 8px 28px;font-size:16px;line-height:1.5;color:#031666;">
+        <p style="margin:0 0 14px 0;font-family:Georgia,serif;font-size:22px;letter-spacing:1px;text-transform:uppercase;">Tu cotización</p>
+        <p style="margin:0 0 14px 0;">Hola <t t-out="object.partner_id.name or ''">Cliente</t>, gracias por escribirnos. Esta es tu cotización <strong><t t-out="object.name"/></strong>; también la encuentras en el PDF adjunto.</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:15px;color:#031666;">
+          <t t-foreach="object.order_line" t-as="line">
+            <tr t-if="not line.display_type">
+              <td style="padding:8px 0;border-bottom:1px solid #EBEBEB;"><t t-out="line.product_uom_qty" t-options="{'widget': 'integer'}"/> × <t t-out="line.product_id.name"/></td>
+              <td align="right" style="padding:8px 0;border-bottom:1px solid #EBEBEB;white-space:nowrap;"><t t-out="format_amount(line.price_total, object.currency_id)"/></td>
+            </tr>
+          </t>
+          <tr>
+            <td style="padding:12px 0;border-top:2px solid #4EB969;"><strong>Total (IVA incluido)</strong></td>
+            <td align="right" style="padding:12px 0;border-top:2px solid #4EB969;white-space:nowrap;"><strong><t t-out="format_amount(object.amount_total, object.currency_id)"/></strong></td>
+          </tr>
+        </table>
+        <p style="margin:10px 0 0 0;font-size:14px;">Envío a domicilio: Q35–Q45 según la zona, se confirma aparte.<t t-if="object.validity_date"> Cotización válida hasta el <t t-out="format_date(object.validity_date, date_format='dd/MM/yyyy')"/>.</t></p>
+        <p style="margin:18px 0 0 0;">Para confirmar tu pedido se requiere un anticipo. Responde a este correo o escríbenos por WhatsApp y te indicamos cómo realizarlo.</p>
+      </td></tr>
+      <tr><td align="center" style="padding:20px 28px 28px 28px;">
+        <a href="https://wa.me/50255412293" style="display:inline-block;background-color:#4EB969;color:#031666;text-decoration:none;font-weight:bold;padding:12px 24px;font-size:16px;">Escribir por WhatsApp</a>
+      </td></tr>
+      <tr><td align="center" style="background-color:#AFDCBF;padding:14px;font-size:13px;color:#031666;">
+        Gatherings · hola@gatheringsgt.com · WhatsApp +502 5541-2293 · gatheringsgt.com
+      </td></tr>
+    </table>
+  </td></tr></table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_recibida" model="mail.template">
+            <field name="name">Pedido recibido, en revisión (Gatherings)</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Recibimos tu solicitud de cotización {{ object.name }}</field>
+            <field name="email_from">{{ object.company_id.email_formatted or user.email_formatted }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background-color:#EBEBEB;font-family:'Gotham Narrow','Barlow Semi Condensed',Arial,sans-serif;color:#031666;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#EBEBEB;"><tr><td align="center" style="padding:24px 12px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;">
+      <tr><td align="center" style="background-color:#031666;padding:24px;">
+        <img src="https://gatheringsgt.com/assets/brand/logo-blanco.png" alt="Gatherings" width="220" style="display:block;border:0;height:auto;max-width:220px;"/>
+      </td></tr>
+      <tr><td style="padding:28px;font-size:16px;line-height:1.5;color:#031666;">
+        <p style="margin:0 0 14px 0;font-family:Georgia,serif;font-size:22px;letter-spacing:1px;text-transform:uppercase;">Recibimos tu solicitud</p>
+        <p style="margin:0 0 14px 0;">Hola <t t-out="object.partner_id.name or ''">Cliente</t>, gracias por escribirnos. Recibimos tu pedido <strong><t t-out="object.name"/></strong> y lo estamos preparando a tu medida.</p>
+        <p style="margin:0 0 14px 0;">Nuestro equipo revisa los detalles y te enviará tu cotización por este mismo medio en breve. Si necesitas algo antes, escríbenos por WhatsApp.</p>
+      </td></tr>
+      <tr><td align="center" style="padding:0 28px 28px 28px;">
+        <a href="https://wa.me/50255412293" style="display:inline-block;background-color:#4EB969;color:#031666;text-decoration:none;font-weight:bold;padding:12px 24px;font-size:16px;">Escribir por WhatsApp</a>
+      </td></tr>
+      <tr><td align="center" style="background-color:#AFDCBF;padding:14px;font-size:13px;color:#031666;">
+        Gatherings · hola@gatheringsgt.com · WhatsApp +502 5541-2293 · gatheringsgt.com
+      </td></tr>
+    </table>
+  </td></tr></table>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

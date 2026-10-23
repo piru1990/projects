@@ -51,6 +51,9 @@ Corrido contra un Odoo 18 real en la Mac mini (Colima) el 2026-10-14/15: 7 produ
 - **Impuestos:** Odoo agrega un impuesto de venta por defecto (15 %) a cada línea, lo que sube el total a Q85,019.50. Se resolvió dejando el IVA 12 % como impuesto incluido en el precio (ver arriba); el TOTAL de la hoja manda. El plan contable queda genérico hasta hablar con el contador.
 Los campos usados son los de Odoo 18 (`type=consu` + `is_storable`). Pruebas: `python3 -m pytest importer/tests` (Odoo simulado y Excel sintético).
 
+## Cotizaciones desde el sitio web
+Addon `addons/gatherings_cotizacion` + `scripts/setup_cotizaciones.sh`: el pedido del sitio se vuelve cotización en Odoo con los precios oficiales y se envía por correo en PDF de marca. Ver `addons/gatherings_cotizacion/README.md`. Los precios del addon (`catalogo.py`) son los oficiales y reemplazan los históricos de `catalog.json` en los productos que comparten SKU; no volver a correr el importador con `--refresh` sin revisar esa diferencia.
+
 ## Falta (siguientes pasos)
 - Materias primas, proveedores y costos: llegan en el Excel de Andrea (importador análogo + listas de materiales).
 - Parte C: formularios de captura para Andrea/el personal, y subdominios por producto (SKU).

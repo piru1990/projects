@@ -41,7 +41,8 @@ header nav a{margin-left:18px;text-decoration:none;font:13px var(--sans);letter-
 .hero h1 img{width:min(560px,86vw);height:auto}
 .hero p{max-width:560px;margin:22px auto 0;font:18px/1.5 var(--sans);opacity:.92}
 .btn{display:inline-block;border:0;border-radius:999px;padding:13px 26px;font:700 15px var(--sans);cursor:pointer;text-decoration:none}
-.btn-wa{background:var(--wa);color:var(--navy)}.btn-line{border:1px solid #fff;color:#fff;margin-left:8px}
+.btn-wa{background:var(--wa);color:var(--navy)}.btn-quote{background:var(--navy);color:#fff}.btn[disabled]{opacity:.6;cursor:wait}.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.qmsg{font:600 14px var(--sans);text-align:center;margin:0;min-height:1.2em;color:var(--navy)}.qmsg.err{color:#b3261e}.qmsg a{color:var(--navy)}
+.btn-line{border:1px solid #fff;color:#fff;margin-left:8px}
 .hero .btns{margin-top:28px}
 .wai{width:1.2em;height:1.2em;flex:none}.btn-ico{display:inline-flex;align-items:center;justify-content:center;gap:8px}footer a.tel{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}footer a.tel .wai{width:18px;height:18px}footer a.tel{transition:color .15s,transform .15s}footer a.tel:hover,footer a.tel:focus-visible{color:var(--green);transform:translateY(-2px)}
 section{padding:64px 0}
@@ -117,6 +118,8 @@ footer .social{flex-wrap:wrap;row-gap:10px}
   <div class="save" id="saveBox" hidden><button type="button" id="saveLink">Guardar mi pedido y terminarlo después (copiar link)</button><button type="button" id="clearCart">Vaciar</button></div>
   <form id="f" style="margin-top:20px">
     <label>Nombre y Apellido<input name="nombre" required autocomplete="name"></label>
+    <label>Correo electrónico (te enviamos la cotización)<input name="correo" type="email" autocomplete="email" inputmode="email"></label>
+    <label>Teléfono o WhatsApp<input name="telefono" type="tel" autocomplete="tel" inputmode="tel"></label>
     <div class="row">
       <label>Fecha del evento o entrega<input name="fecha" type="date" required></label>
       <label>Horario de entrega<select name="horario" required><option value="" disabled selected>Elige una opción</option><option>Durante la mañana</option><option>Durante la tarde</option></select></label>
@@ -124,8 +127,12 @@ footer .social{flex-wrap:wrap;row-gap:10px}
     <label>Zona y dirección exacta<textarea name="dir" rows="2" placeholder="Zona, colonia, referencias"></textarea></label>
     <label>Mensaje personalizado (detalla el mensaje especial que quieres que lleve tu producto)<textarea name="mensaje" rows="2"></textarea></label>
     <label>Notas (alergias, número de personas, ocasión)<textarea name="notas" rows="2"></textarea></label>
-    <button class="btn btn-wa btn-ico" type="submit" aria-label="Enviar pedido por WhatsApp">Enviar pedido <svg class="wai" aria-hidden="true"><use href="#wa"/></svg></button>
-    <p class="note">No se cobra nada en la página: el envío y el pago se acuerdan por chat. Tu pedido queda guardado en este navegador.</p>
+    <div class="hp" aria-hidden="true"><label>Empresa<input name="empresa" tabindex="-1" autocomplete="off"></label></div>
+    <div id="ts"></div>
+    <button class="btn btn-quote" type="submit" data-via="quote">Recibir cotización por correo</button>
+    <button class="btn btn-wa btn-ico" type="submit" data-via="wa" aria-label="Enviar pedido por WhatsApp">Enviar pedido por WhatsApp <svg class="wai" aria-hidden="true"><use href="#wa"/></svg></button>
+    <p class="qmsg" id="qmsg" role="status" aria-live="polite"></p>
+    <p class="note">No se cobra nada en la página: la cotización llega a tu correo y el envío y el pago se acuerdan por chat. Tu pedido queda guardado en este navegador.</p>
   </form>
 </div></section>
 

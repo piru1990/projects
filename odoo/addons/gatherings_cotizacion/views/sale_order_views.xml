@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_order_search_gt" model="ir.ui.view">
+        <field name="name">sale.order.search.gatherings.cotizacion</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Del sitio web" name="gt_web" domain="[('gt_web', '=', True)]"/>
+                <filter string="Por revisar (sitio web)" name="gt_por_revisar"
+                        domain="[('gt_web', '=', True), ('state', '=', 'draft')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_form_gt" model="ir.ui.view">
+        <field name="name">sale.order.form.gatherings.cotizacion</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="gt_web" invisible="not gt_web"/>
+                <field name="gt_revision" invisible="not gt_revision"/>
+                <field name="gt_fecha_entrega"/>
+                <field name="gt_horario"/>
+                <field name="gt_direccion"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -4,6 +4,8 @@
 /* ===== CONFIGURACIÓN (editable) ===== */
 const WA = "50255412293";          // +502 5541 2293
 const CURRENCY = "Q";
+const API_COTIZAR = "/api/cotizar";   // POST: Odoo crea la cotización y se la envía al cliente (ver _worker.js)
+const TURNSTILE_KEY = "";   // clave pública del widget Cloudflare Turnstile; vacío = sin verificación (el Worker la exige si tiene TURNSTILE_SECRET)
 /* price: número en quetzales (IVA incluido), o null para "Cotizar". min: pedido mínimo de unidades (opcional).
    photo: foto de la tarjeta, ruta desde la raíz del sitio; vacío = recuadro «Foto próximamente».
    gallery: fotos del detalle (la primera es la principal).  incl: «Qué incluye» (texto, o lista de viñetas; vacío = se confirma por WhatsApp).
@@ -180,13 +182,60 @@ function copy(text, okMsg){
   else prompt("Copiá este link:", text);
 }
 
+function waText(f, L){
+  const items = L.length ? L.map(x => `• ${x.p.unit ? unitsTxt(x.p, x.n) : x.n} × ${x.p.name}${x.p.price ? " (" + money(x.p.price * x.n) + ")" : " (precio por confirmar)"}`).join("\n") : "• (sin productos: quiero cotizar)";
+  const tot = L.length && L.every(x => x.p.price) ? "\nSubtotal tablas: " + money(L.reduce((a,x) => a + x.p.price * x.n, 0)) + " (envío aparte, Q35–Q45)" : "";
+  return `Hola Gatherings, quiero hacer un pedido:\n${items}${tot}\n\nNombre: ${f.get("nombre")}\nFecha: ${f.get("fecha")}\nHorario de entrega: ${f.get("horario")}\nDirección: ${f.get("dir") || "-"}\nMensaje personalizado: ${f.get("mensaje") || "-"}\nNotas: ${f.get("notas") || "-"}`;
+}
+
+/* Cloudflare Turnstile (anti-bots): se carga al tocar el formulario, no al abrir la página. */
+let tsToken = "", tsWidget = null;
+function loadTurnstile(){
+  if (!TURNSTILE_KEY || document.getElementById("tsScript")) return;
+  const s = document.createElement("script");
+  s.id = "tsScript"; s.async = true; s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+  s.onload = () => { tsWidget = window.turnstile.render("#ts", {sitekey: TURNSTILE_KEY, callback: t => { tsToken = t; }, "expired-callback": () => { tsToken = ""; }, "error-callback": () => { tsToken = ""; }}); };
+  document.head.appendChild(s);
+}
+
+function say(text, cls, waLink){
+  const m = $("#qmsg"); m.className = "qmsg" + (cls ? " " + cls : ""); m.textContent = text;
+  if (waLink){ m.appendChild(document.createTextNode(" ")); const a = document.createElement("a"); a.href = waLink; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Continuar por WhatsApp"; m.appendChild(a); }
+}
+
+/* «Recibir cotización por correo»: el pedido va a Odoo, que arma la cotización con los precios oficiales y la envía. */
+async function quote(f, L){
+  const btns = document.querySelectorAll("#f button[type=submit]"), correo = (f.get("correo") || "").trim();
+  if (!L.length) return say("Agrega al menos un producto para recibir tu cotización por correo. Para un evento a la medida, escríbenos por WhatsApp.", "err");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)){ $("#f").elements.correo.focus(); return say("Escribe un correo válido para enviarte la cotización.", "err"); }
+  if (TURNSTILE_KEY && !tsToken){ loadTurnstile(); return say("Un momento: estamos verificando que eres una persona. Vuelve a pulsar el botón en unos segundos."); }
+  const body = {items: L.map(x => ({id: x.p.id, qty: x.n})), turnstile: tsToken, empresa: f.get("empresa") || ""};
+  ["nombre","correo","telefono","fecha","horario","dir","mensaje","notas"].forEach(k => { body[k] = (f.get(k) || "").trim(); });
+  btns.forEach(b => { b.disabled = true; });
+  say("Preparando tu cotización…");
+  const alWa = () => say("No pudimos generar la cotización automática en este momento.", "err", wa(waText(f, L)));
+  try {
+    const r = await fetch(API_COTIZAR, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(body)});
+    const j = await r.json().catch(() => ({}));
+    if (j.ok){
+      say(j.estado === "enviada"
+        ? `¡Listo! Te enviamos la cotización a ${correo}. Si no la ves, revisa tu carpeta de spam o promociones.`
+        : `Recibimos tu solicitud. Te enviaremos la cotización a ${correo} en breve.`, "");
+      Object.keys(cart).forEach(k => delete cart[k]); store.set(CART_KEY, cart); render();
+    } else if (j.fallback || !r.ok && !j.error) alWa();
+    else say(j.error || "Revisa los datos de tu pedido.", "err");
+  } catch (e) { alWa(); }
+  finally {
+    btns.forEach(b => { b.disabled = false; });
+    tsToken = ""; if (tsWidget !== null && window.turnstile) window.turnstile.reset(tsWidget);
+  }
+}
+
 function send(e){
   e.preventDefault();
   const f = new FormData($("#f")), L = lines();
-  const items = L.length ? L.map(x => `• ${x.p.unit ? unitsTxt(x.p, x.n) : x.n} × ${x.p.name}${x.p.price ? " (" + money(x.p.price * x.n) + ")" : " (precio por confirmar)"}`).join("\n") : "• (sin productos: quiero cotizar)";
-  const tot = L.length && L.every(x => x.p.price) ? "\nSubtotal tablas: " + money(L.reduce((a,x) => a + x.p.price * x.n, 0)) + " (envío aparte, Q35–Q45)" : "";
-  const t = `Hola Gatherings, quiero hacer un pedido:\n${items}${tot}\n\nNombre: ${f.get("nombre")}\nFecha: ${f.get("fecha")}\nHorario de entrega: ${f.get("horario")}\nDirección: ${f.get("dir") || "-"}\nMensaje personalizado: ${f.get("mensaje") || "-"}\nNotas: ${f.get("notas") || "-"}`;
-  window.open(wa(t), "_blank", "noopener");
+  if (e.submitter && e.submitter.dataset.via === "quote"){ quote(f, L); return false; }
+  window.open(wa(waText(f, L)), "_blank", "noopener");
   return false;
 }
 
@@ -211,6 +260,7 @@ function init(){
     store.set(FORM_KEY, d);
   });
   form.addEventListener("submit", send);
+  form.addEventListener("focusin", loadTurnstile, {once: true});
 
   document.addEventListener("click", ev => {
     const o = ev.target.closest("[data-open]");
