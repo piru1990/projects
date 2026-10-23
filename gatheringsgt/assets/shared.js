@@ -5,7 +5,7 @@
 const WA = "50255412293";          // +502 5541 2293
 const CURRENCY = "Q";
 const API_COTIZAR = "/api/cotizar";   // POST: Odoo crea la cotización y se la envía al cliente (ver _worker.js)
-const TURNSTILE_KEY = "";   // clave pública del widget Cloudflare Turnstile; vacío = sin verificación (el Worker la exige si tiene TURNSTILE_SECRET)
+const TURNSTILE_KEY = "0x4AAAAAAFi5dZKAr9CTywNw";   // clave pública del widget Cloudflare Turnstile; vacío = sin verificación (el Worker la exige si tiene TURNSTILE_SECRET)
 /* price: número en quetzales (IVA incluido), o null para "Cotizar". min: pedido mínimo de unidades (opcional).
    photo: foto de la tarjeta, ruta desde la raíz del sitio; vacío = recuadro «Foto próximamente».
    gallery: fotos del detalle (la primera es la principal).  incl: «Qué incluye» (texto, o lista de viñetas; vacío = se confirma por WhatsApp).
@@ -208,7 +208,7 @@ async function quote(f, L){
   const btns = document.querySelectorAll("#f button[type=submit]"), correo = (f.get("correo") || "").trim();
   if (!L.length) return say("Agrega al menos un producto para recibir tu cotización por correo. Para un evento a la medida, escríbenos por WhatsApp.", "err");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)){ $("#f").elements.correo.focus(); return say("Escribe un correo válido para enviarte la cotización.", "err"); }
-  if (TURNSTILE_KEY && !tsToken){ loadTurnstile(); return say("Un momento: estamos verificando que eres una persona. Vuelve a pulsar el botón en unos segundos."); }
+  if (TURNSTILE_KEY && !tsToken){ loadTurnstile(); return say("Un momento: estamos verificando que eres una persona. Vuelve a pulsar el botón en unos segundos o, si no avanza,", "", wa(waText(f, L))); }
   const body = {items: L.map(x => ({id: x.p.id, qty: x.n})), turnstile: tsToken, empresa: f.get("empresa") || ""};
   ["nombre","correo","telefono","fecha","horario","dir","mensaje","notas"].forEach(k => { body[k] = (f.get(k) || "").trim(); });
   btns.forEach(b => { b.disabled = true; });
