@@ -147,12 +147,10 @@ export default {
       .on('meta[property="og:title"]', setContent(title))
       .on('meta[property="og:description"]', setContent(desc))
       .on('meta[property="og:image"]', setContent(image))
+      .on('meta[property="og:image:width"]', setContent("900"))
+      .on('meta[property="og:image:height"]', setContent("675"))
       .on("head", {
-        element: (el) => el.append(
-          `<meta property="og:url" content="${page}">` +
-          '<meta property="og:image:width" content="900"><meta property="og:image:height" content="675">' +
-          '<meta name="twitter:card" content="summary_large_image">',
-          { html: true })
+        element: (el) => el.append(`<meta property="og:url" content="${page}">`, { html: true })
       })
       .transform(res);
   }
