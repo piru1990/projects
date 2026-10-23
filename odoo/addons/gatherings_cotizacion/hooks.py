@@ -55,6 +55,7 @@ def _marca(env):
         "primary_color": "#031666",
         "secondary_color": "#4EB969",
         "report_footer": PIE,
+        **({} if company.email else {"email": "hola@gatheringsgt.com"}),   # remitente de los correos y destino de los avisos
         **({} if company.company_details else {"company_details": "<p>Gatherings GT<br/>hola@gatheringsgt.com</p>"}),
         "layout_background": "Blank",
         "external_report_layout_id": env.ref("web.external_layout_standard").id,

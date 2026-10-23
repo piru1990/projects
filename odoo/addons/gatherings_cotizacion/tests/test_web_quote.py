@@ -146,3 +146,24 @@ class TestWebQuote(TransactionCase):
         r = self.Order.with_user(usuario).gt_web_quote(self.pedido([{"id": "cozy", "qty": 1}], correo="tecnico@example.com"))
         self.assertTrue(r["ok"], r)
         self.assertEqual(r["estado"], "enviada")
+
+    def _usuario_tecnico(self):
+        grupos = [self.env.ref("sales_team.group_sale_salesman_all_leads").id, self.env.ref("base.group_partner_manager").id]
+        return self.env["res.users"].with_context(no_reset_password=True).create(
+            {"name": "Web Cotizaciones 2", "login": "web-test-2", "groups_id": [(6, 0, grupos)]})
+
+    def test_revision_con_el_usuario_tecnico_sin_correo(self):
+        """Un pedido a la medida llega a «revisión» aunque el usuario técnico no tenga correo (la actividad le avisa a otro usuario)."""
+        r = self.Order.with_user(self._usuario_tecnico()).gt_web_quote(self.pedido([{"id": "tailored", "qty": 1}], correo="rev@example.com"))
+        self.assertTrue(r["ok"], r)
+        self.assertEqual(r["estado"], "revision")
+
+    def test_falla_del_correo_deja_borrador_aunque_falten_remitentes(self):
+        """Sin correo en la compañía no se puede enviar: la cotización queda en borrador y la API responde ok."""
+        self.env.company.email = False
+        r = self.Order.with_user(self._usuario_tecnico()).gt_web_quote(self.pedido([{"id": "single", "qty": 1}], correo="sin@example.com"))
+        self.assertTrue(r["ok"], r)
+        self.assertEqual(r["estado"], "revision")
+        orden = self.Order.search([("name", "=", r["cotizacion"])])
+        self.assertEqual(orden.state, "draft")
+        self.assertIn("No se pudo enviar", orden.gt_revision)
