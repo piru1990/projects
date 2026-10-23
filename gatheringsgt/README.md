@@ -16,8 +16,9 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 - Pedido guardado: `/?pedido=cozy.2,single.1`; restaura el carrito en cualquier dispositivo. El carrito y el borrador del formulario también se guardan en el navegador.
 
 ## Cómo editar y redesplegar
-- Productos, precios, descripciones y fotos: constante `PRODUCTS` en `assets/shared.js`. `photo` es la foto de la tarjeta, `gallery` las fotos del detalle (`pics("cozy",5)` = `fotos/cozy/1.jpg`…`5.jpg`) e `incl` la lista de «Qué incluye» (vacía = «lo confirmamos por WhatsApp»).
-- Pendiente (JOBS-159): precio, descripción y «Qué incluye» de The Little Box, The Celebration Box, The Mini Dome, The Big Dome y The Glass Dome; hoy se cotizan por WhatsApp. Las fotos se prepararon a 1200 px y menos de ~150 KB desde la carpeta «Photos gatherings.com».
+- Productos, precios, descripciones y fotos: constante `PRODUCTS` en `assets/shared.js` (el orden de la lista es el del menú). `photo` es la foto de la tarjeta, `gallery` las fotos del detalle (`pics("cozy",5)` = `fotos/cozy/1.jpg`…`5.jpg`) e `incl` la lista de «Qué incluye» (vacía = «lo confirmamos por WhatsApp»).
+- Cada producto lleva además `info` (líneas «Tamaño», «Porciones» o «Presentación»), `unit` (unidad del precio cuando no es «c/u»; The Grazing Table se pide por persona) y `note` (texto final del detalle). `incl` es un texto o una lista de viñetas.
+- Fotos de boxes y domes: las que se ajustaron (zoom sin el corte del fondo azul, sin la tapa de las cajas) están ya recortadas en 4:3 (1200 × 900), porque la galería muestra las fotos en 4:3 y recorta al centro lo que sobra.
 - Vista previa al compartir: `_worker.js` (Cloudflare Pages, modo avanzado) cambia las etiquetas `og:*` de `/?p=<id>` y `/m/?p=<id>` por las del producto (nombre, precio y foto de su tarjeta). WhatsApp y Facebook no ejecutan JavaScript, por eso se hace en el servidor. La lista `PRODUCTS` de `_worker.js` hay que mantenerla igual que la de `assets/shared.js` (nombre, precio, mínimo). Para refrescar una vista previa ya guardada: Facebook Sharing Debugger, o probar el link con un parámetro extra (`&x=1`).
 - Desplegar: Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production.
 
