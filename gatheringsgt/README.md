@@ -22,6 +22,11 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 - Vista previa al compartir: `_worker.js` (Cloudflare Pages, modo avanzado) cambia las etiquetas `og:*` de `/?p=<id>` y `/m/?p=<id>` por las del producto (nombre, precio y foto de su tarjeta). WhatsApp y Facebook no ejecutan JavaScript, por eso se hace en el servidor. La lista `PRODUCTS` de `_worker.js` hay que mantenerla igual que la de `assets/shared.js` (nombre, precio, mínimo). Para refrescar una vista previa ya guardada: Facebook Sharing Debugger, o probar el link con un parámetro extra (`&x=1`).
 - Desplegar: Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production.
 
+## Cotización por correo (Odoo)
+- El formulario tiene dos botones: «Recibir cotización por correo» (usa `POST /api/cotizar`, en `_worker.js`) y «Enviar pedido por WhatsApp» (como antes). El Worker manda a Odoo solo producto y cantidad más los datos del formulario; Odoo pone precios y mínimos, crea la cotización y se la envía al cliente. Si Odoo no responde, se ofrece el enlace a WhatsApp con el pedido.
+- Variables, secretos de Pages, Service Token de Access y Turnstile (`TURNSTILE_KEY` en `assets/shared.js`): ver `odoo/addons/gatherings_cotizacion/README.md`. Pruebas: `node --test tests/site/cotizar.test.mjs`.
+- Si cambias un precio, mínimo o producto, actualiza también `odoo/addons/gatherings_cotizacion/catalogo.py` (el test `odoo/tests/test_cotizacion_catalogo.py` avisa si quedan distintos).
+
 ## Estadísticas (Google Analytics 4)
 - `assets/analytics.js` carga GA4 en ambas versiones. Usa el ID de medición `G-CMDLKTR9FJ` (constante `GA_ID`); si se deja vacío, queda apagado.
 - Sin señales de publicidad. La primera visita muestra un aviso breve; «No permitir» desactiva la medición en ese navegador (se guarda en `localStorage`, clave `gt_analytics`).

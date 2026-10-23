@@ -1,0 +1,59 @@
+// Tipografías de la marca en los PDF: Rossten para títulos y Barlow Semi Condensed (reemplazo de Gotham Narrow) para el texto.
+// wkhtmltopdf (el que genera el PDF) no lee woff2: aquí van .otf/.ttf convertidos de los de assets/fonts del sitio.
+// Para usar el Gotham Narrow original, reemplazar solo los tres archivos gotham-narrow-*.ttf.
+@font-face {
+    font-family: "Rossten";
+    src: url("/gatherings_cotizacion/static/fonts/rossten.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Gotham Narrow";
+    src: url("/gatherings_cotizacion/static/fonts/gotham-narrow-400.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Gotham Narrow";
+    src: url("/gatherings_cotizacion/static/fonts/gotham-narrow-600.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Gotham Narrow";
+    src: url("/gatherings_cotizacion/static/fonts/gotham-narrow-700.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+}
+
+.gt-cotizacion, .o_company_1_layout, .article, .footer {
+    font-family: "Gotham Narrow", "Barlow Semi Condensed", Arial, sans-serif;
+    color: #031666;
+}
+.article h2, .gt-cotizacion h2 {
+    font-family: "Rossten", Georgia, serif;
+    font-weight: normal;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #031666;
+}
+.gt-cotizacion .o_main_table thead th {
+    font-family: "Rossten", Georgia, serif;
+    font-weight: normal;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background-color: #AFDCBF;
+    color: #031666;
+    border: 0;
+}
+.gt-cotizacion .o_main_table tbody td {
+    border-bottom: 1px solid #EBEBEB;
+}
+.gt-cotizacion .o_total {
+    color: #031666;
+    border-top: 2px solid #4EB969;
+}
+.gt-cotizacion .gt-terminos {
+    margin-top: 24px;
+    font-size: 0.9em;
+}

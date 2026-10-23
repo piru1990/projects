@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- PDF de cotización con la marca de Gatherings. Texto fijo en español: no depende del idioma de la base. -->
+    <template id="report_cotizacion_document">
+        <t t-call="web.external_layout">
+            <t t-set="address">
+                <strong t-out="doc.partner_id.name"/>
+                <div t-if="doc.partner_id.email" t-out="doc.partner_id.email"/>
+                <div t-if="doc.partner_id.phone" t-out="doc.partner_id.phone"/>
+            </t>
+            <div class="page gt-cotizacion">
+                <t t-set="layout_document_title">
+                    <span t-if="doc.state in ['draft', 'sent']">Cotización </span>
+                    <span t-else="">Pedido </span>
+                    <span t-field="doc.name"/>
+                </t>
+                <div class="row mb-4" id="informations">
+                    <div t-if="doc.date_order" class="col">
+                        <strong>Fecha</strong>
+                        <div t-field="doc.date_order" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                    </div>
+                    <div t-if="doc.validity_date and doc.state in ['draft', 'sent']" class="col">
+                        <strong>Válida hasta</strong>
+                        <div t-field="doc.validity_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                    </div>
+                    <div t-if="doc.gt_fecha_entrega" class="col">
+                        <strong>Evento o entrega</strong>
+                        <div><span t-field="doc.gt_fecha_entrega" t-options='{"format": "dd/MM/yyyy"}'/><span t-if="doc.gt_horario"> · <t t-out="doc.gt_horario"/></span></div>
+                    </div>
+                </div>
+                <p t-if="doc.gt_direccion" class="mb-4"><strong>Dirección: </strong><span t-field="doc.gt_direccion"/></p>
+
+                <table class="table o_main_table table-borderless">
+                    <thead style="display: table-row-group">
+                        <tr>
+                            <th class="text-start">Producto</th>
+                            <th class="text-end text-nowrap">Cantidad</th>
+                            <th class="text-end text-nowrap">Precio unitario</th>
+                            <th class="text-end text-nowrap">Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.order_line" t-as="line">
+                            <tr t-if="not line.display_type">
+                                <td><span t-field="line.product_id.name"/></td>
+                                <td class="text-end text-nowrap">
+                                    <span t-field="line.product_uom_qty" t-options='{"widget": "integer"}'/>
+                                    <span t-if="line.product_id.product_tmpl_id.gt_unit_label"> <t t-out="line.product_id.product_tmpl_id.gt_unit_label"/>s</span>
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <span t-if="line.price_unit" t-field="line.price_unit"/>
+                                    <span t-else="">Por confirmar</span>
+                                </td>
+                                <td class="text-end text-nowrap"><span t-field="line.price_total"/></td>
+                            </tr>
+                            <tr t-elif="line.display_type == 'line_note'" class="fst-italic">
+                                <td colspan="4"><span t-field="line.name"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div class="clearfix">
+                    <div class="row mt-n3">
+                        <div class="col-6 ms-auto">
+                            <table class="table table-borderless o_total_table">
+                                <tr class="border-black o_total">
+                                    <td><strong>Total (IVA incluido)</strong></td>
+                                    <td class="text-end"><strong t-field="doc.amount_total"/></td>
+                                </tr>
+                                <tr t-if="doc.amount_tax">
+                                    <td>IVA 12 % incluido</td>
+                                    <td class="text-end"><span t-field="doc.amount_tax"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gt-terminos">
+                    <p t-if="doc.validity_date and doc.state in ['draft', 'sent']">
+                        Esta cotización es válida hasta el <span t-field="doc.validity_date" t-options='{"format": "dd/MM/yyyy"}'/>. Los precios incluyen IVA.
+                    </p>
+                    <p>Para confirmar tu pedido se requiere un anticipo. Respóndenos a este correo o escríbenos por WhatsApp y te
+                        indicamos cómo realizarlo.</p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_cotizacion">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="gatherings_cotizacion.report_cotizacion_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_cotizacion" model="ir.actions.report">
+        <field name="name">Cotización Gatherings</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">gatherings_cotizacion.report_cotizacion</field>
+        <field name="report_file">gatherings_cotizacion.report_cotizacion</field>
+        <field name="print_report_name">'Cotizacion-%s' % (object.name or '').replace('/', '-')</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
