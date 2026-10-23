@@ -16,8 +16,9 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 - Pedido guardado: `/?pedido=cozy.2,single.1`; restaura el carrito en cualquier dispositivo. El carrito y el borrador del formulario también se guardan en el navegador.
 
 ## Cómo editar y redesplegar
-- Productos, precios, descripciones y fotos: constante `PRODUCTS` en `assets/shared.js`. `photo` es la foto de la tarjeta, `gallery` las fotos del detalle (`pics("cozy",5)` = `fotos/cozy/1.jpg`…`5.jpg`) e `incl` la lista de «Qué incluye» (vacía = «lo confirmamos por WhatsApp»).
-- Pendiente (JOBS-159): precio, descripción y «Qué incluye» de The Little Box, The Celebration Box, The Mini Dome, The Big Dome y The Glass Dome; hoy se cotizan por WhatsApp. Las fotos se prepararon a 1200 px y menos de ~150 KB desde la carpeta «Photos gatherings.com».
+- Productos, precios, descripciones y fotos: constante `PRODUCTS` en `assets/shared.js` (el orden de la lista es el del menú). `photo` es la foto de la tarjeta, `gallery` las fotos del detalle (`pics("cozy",5)` = `fotos/cozy/1.jpg`…`5.jpg`) e `incl` la lista de «Qué incluye» (vacía = «lo confirmamos por WhatsApp»).
+- Cada producto lleva además `info` (líneas «Tamaño», «Porciones» o «Presentación»), `unit` (unidad del precio cuando no es «c/u»; The Grazing Table se pide por persona) y `note` (texto final del detalle). `incl` es un texto o una lista de viñetas.
+- Fotos de boxes y domes: las que se ajustaron (zoom sin el corte del fondo azul, sin la tapa de las cajas) están ya recortadas en 4:3 (1200 × 900), porque la galería muestra las fotos en 4:3 y recorta al centro lo que sobra.
 - Vista previa al compartir: `_worker.js` (Cloudflare Pages, modo avanzado) cambia las etiquetas `og:*` de `/?p=<id>` y `/m/?p=<id>` por las del producto (nombre, precio y foto de su tarjeta). WhatsApp y Facebook no ejecutan JavaScript, por eso se hace en el servidor. La lista `PRODUCTS` de `_worker.js` hay que mantenerla igual que la de `assets/shared.js` (nombre, precio, mínimo). Para refrescar una vista previa ya guardada: Facebook Sharing Debugger, o probar el link con un parámetro extra (`&x=1`).
 - Desplegar: Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production.
 
@@ -29,7 +30,7 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 ## Línea gráfica (JOBS-156)
 Recursos de marca en `assets/brand/` (optimizados a partir de la carpeta «Fotos Webpage» / Gatherings Visual Identity):
 - Paleta: azul `#031666`, verde claro `#AFDCBF`, verde `#4EB969`, gris `#EBEBEB` (variables CSS al inicio de cada página).
-- Tipografías de marca: Rossten (títulos) y Gotham Narrow (apoyo). Son fuentes con licencia que no están en el repo: las páginas las piden por nombre y, si no están instaladas, usan Georgia y la fuente del sistema. Para activarlas, agregar los archivos `.woff2` en `assets/fonts/` y declarar `@font-face`.
+- Tipografías de marca: Rossten (títulos, `assets/fonts/rossten.woff2`, convertida del .otf que pasó Allan) y Gotham Narrow (texto de apoyo). Gotham Narrow es de pago; mientras tanto el sitio usa **Barlow Semi Condensed** (licencia OFL, `assets/fonts/LICENSE-Barlow-OFL.txt`) declarada con el nombre «Gotham Narrow» en el `@font-face` de cada página: para usar la original basta reemplazar los tres `gotham-narrow-*.woff2` (400, 600 y 700). El archivo «Gotham Narrow XLight» de OnlineWebFonts es cursiva (−12°) y delgadísimo, por eso no se usó (además exige crédito CC BY 4.0).
 - `logo-blanco.png`: logo sobre azul (encabezado y portada). `the-azul.png`: isotipo THE (recuadro de «Foto próximamente»). `romero-azul.png`: ramita de romero (pie). `icon-the.png` y `favicon.png`: ícono. `og.jpg`: imagen al compartir el link.
 - Fondos: `fondo-the-azul.webp` (pedido; la portada y el menú van en color sólido), `fondo-romero-gris.webp` (cómo pedir y fondo móvil).
 - Identidades visuales como encabezados: `the-board-*` (menú), `the-moment-*` (cómo pedir, y pedido en móvil), `the-sharing-*` (pedido en escritorio).

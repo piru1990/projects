@@ -6,20 +6,46 @@ const WA = "50255412293";          // +502 5541 2293
 const CURRENCY = "Q";
 /* price: número en quetzales (IVA incluido), o null para "Cotizar". min: pedido mínimo de unidades (opcional).
    photo: foto de la tarjeta, ruta desde la raíz del sitio; vacío = recuadro «Foto próximamente».
-   gallery: fotos del detalle (la primera es la principal).  incl: lista «Qué incluye» (vacía = se confirma por WhatsApp). */
+   gallery: fotos del detalle (la primera es la principal).  incl: «Qué incluye» (texto, o lista de viñetas; vacío = se confirma por WhatsApp).
+   info: líneas «Tamaño», «Porciones» o «Presentación» ([[etiqueta, valor], ...]).  unit: unidad del precio si no es «c/u» (ej. "persona").  note: texto final del detalle. */
 const pics = (id, n) => Array.from({length: n}, (_, i) => `fotos/${id}/${i + 1}.jpg`);
-const PENDING = "Descripción próximamente. Escríbenos por chat para más información.";
 const PRODUCTS = [
-  {id:"single",    name:"The Single",    desc:"Práctica, individual y lista para disfrutar. Cubre 1 persona.",                         price:150,   photo:"fotos/single/card.jpg",    gallery:pics("single",5),    incl:[]},
-  {id:"cozy",      name:"The Cozy",      desc:"Perfecta para compartir en pareja o grupo pequeño. Cubre de 2 a 3 personas.",             price:260,  photo:"fotos/cozy/card.jpg",      gallery:pics("cozy",5),      incl:[]},
-  {id:"homestyle", name:"The Homestyle", desc:"Pensada para reuniones familiares o entre amigos. Cubre de 4 a 6 personas.",               price:500,  photo:"fotos/homestyle/card.jpg", gallery:pics("homestyle",5), incl:[]},
-  {id:"gathering", name:"The Gathering", desc:"Abundante, para encuentros especiales. Cubre de 7 a 10 personas.",                         price:800,  photo:"fotos/gathering/card.jpg", gallery:pics("gathering",5), incl:[]},
-  {id:"little-box",      name:"The Little Box",      desc:PENDING, price:65, min:5, photo:"fotos/little-box/card.jpg",      gallery:pics("little-box",2),      incl:[]},
-  {id:"celebration-box", name:"The Celebration Box", desc:PENDING, price:175, min:5, photo:"fotos/celebration-box/card.jpg", gallery:pics("celebration-box",4), incl:[]},
-  {id:"mini-dome",       name:"The Mini Dome",       desc:PENDING, price:30, min:10, photo:"fotos/mini-dome/card.jpg",       gallery:pics("mini-dome",2),       incl:[]},
-  {id:"big-dome",        name:"The Big Dome",        desc:PENDING, price:50, min:10, photo:"fotos/big-dome/card.jpg",        gallery:pics("big-dome",3),        incl:[]},
-  {id:"glass-dome",      name:"The Glass Dome",      desc:PENDING, price:75, min:10, photo:"fotos/glass-dome/card.jpg",      gallery:pics("glass-dome",3),      incl:[]},
-  {id:"tailored",  name:"The Tailored",  desc:"Hecha a la medida: ingredientes, cantidades y adaptaciones (sugar free, gluten free, entre otras). El precio varía.", price:null, photo:"fotos/tailored/card.jpg", gallery:pics("tailored",5), incl:[]}
+  {id:"single", name:"The Single", desc:"Pequeña selección gourmet para disfrutar algo especial en cualquier momento.", price:150, photo:"fotos/single/card.jpg", gallery:pics("single",5),
+   incl:"Uvas verdes sin semilla, quesos cheddar, suizo y pepper jack, dip de queso de cabra con frutos secos, salami imperial, salami español, miel, aceitunas, galletas multigrano, mini pretzels, dátiles y almendras cubiertas de chocolate.",
+   info:[["Tamaño","10 × 15 cm"],["Porciones","1–2 personas"]]},
+  {id:"cozy", name:"The Cozy", desc:"Perfecta para compartir en pareja o grupo pequeño.", price:260, photo:"fotos/cozy/card.jpg", gallery:pics("cozy",5),
+   incl:"Uvas verdes sin semilla, fresas frescas, quesos cheddar, suizo y pepper jack, dip de queso de cabra con frutos secos, salami imperial, salami español, miel, aceitunas, galletas multigrano, mini pretzels, pan, dátiles y almendras cubiertas de chocolate.",
+   info:[["Tamaño","20 × 30 cm"],["Porciones","2–3 personas"]]},
+  {id:"homestyle", name:"The Homestyle", desc:"Hecha para reunir a la familia y los amigos alrededor de una mesa llena de sabores.", price:500, photo:"fotos/homestyle/card.jpg", gallery:pics("homestyle",5),
+   incl:"Uvas verdes sin semilla, fresas frescas, quesos cheddar, suizo y pepper jack, dip de queso de cabra con frutos secos, salami imperial, salami español, jamón serrano, miel, aceitunas, galletas multigrano, mini pretzels, pan, dátiles y almendras cubiertas de chocolate.",
+   info:[["Tamaño","20 × 60 cm"],["Porciones","4–6 personas"]]},
+  {id:"gathering", name:"The Gathering", desc:"Abundante, artesanal y pensada para hacer extraordinarios los encuentros especiales.", price:800, photo:"fotos/gathering/card.jpg", gallery:pics("gathering",5),
+   incl:"Uvas verdes sin semilla, fresas frescas, quesos cheddar, suizo y pepper jack, dip de queso de cabra con frutos secos, salami imperial, salami español, jamón serrano, miel, aceitunas, galletas multigrano, mini pretzels, pan, dátiles y almendras cubiertas de chocolate.",
+   info:[["Tamaño","30 × 70 cm"],["Porciones","7–10 personas"]]},
+  {id:"tailored", name:"The Tailored", desc:"Una creación a tu medida, diseñada según tus gustos, tu ocasión y tu estilo.", price:null, photo:"fotos/tailored/card.jpg", gallery:pics("tailored",5),
+   incl:"Una selección personalizada de quesos, charcutería, frutas frescas y acompañamientos gourmet, definida según tus preferencias, la ocasión y tu presupuesto. Cada creación se diseña a tu medida.",
+   info:[]},
+  {id:"little-box", name:"The Little Box", desc:"Pequeño detalle gourmet, cuidadosamente presentado y listo para disfrutar.", price:65, min:5, photo:"fotos/little-box/card.jpg", gallery:pics("little-box",2),
+   incl:"Uvas verdes, queso cheddar, salami español, galletas multigrano, nueces naturales y almendras cubiertas de chocolate.",
+   info:[["Presentación","cajita de cartón blanco de 10 × 10 cm con tapa transparente."]]},
+  {id:"celebration-box", name:"The Celebration Box", desc:"Charcutería y vino en una presentación especial para sorprender, regalar y brindar.", price:175, min:5, photo:"fotos/celebration-box/card.jpg", gallery:pics("celebration-box",4),
+   incl:"Una mini botella de vino tinto o rosado, acompañada de The Little Box con uvas verdes, queso cheddar, salami español, galletas multigrano, nueces naturales y almendras cubiertas de chocolate.",
+   info:[["Presentación","caja de cartón blanco de 20 × 20 cm con ventana transparente."]]},
+  {id:"mini-dome", name:"The Mini Dome", desc:"Una porción individual de charcutería, ideal para eventos, detalles corporativos y regalos especiales.", price:30, min:10, photo:"fotos/mini-dome/card.jpg", gallery:pics("mini-dome",2),
+   incl:"Uvas verdes sin semilla, queso cheddar, salami español y fresa fresca.",
+   info:[["Presentación","mini domo transparente de plástico."]]},
+  {id:"big-dome", name:"The Big Dome", desc:"Una presentación especial de charcutería con una delicada flor de salami, perfecta para eventos, celebraciones y regalos memorables.", price:50, min:10, photo:"fotos/big-dome/card.jpg", gallery:pics("big-dome",3),
+   incl:"Una flor de salami español, uvas verdes sin semilla, fresa fresca, quesos cheddar y pepper jack, y galletas multigrano.",
+   info:[["Presentación","domo transparente de plástico."]]},
+  {id:"glass-dome", name:"The Glass Dome", desc:"Una pequeña creación gourmet bajo una elegante cúpula de vidrio.", price:75, min:10, photo:"fotos/glass-dome/card.jpg", gallery:pics("glass-dome",2),
+   incl:"Una flor de salami español, uvas verdes sin semilla, fresa fresca, queso cheddar y galletas multigrano.",
+   info:[["Presentación","elegante domo de vidrio."]]},
+  {id:"grazing-table", name:"The Grazing Table", desc:"Una mesa de charcutería diseñada a tu medida, con una selección gourmet para convertir cualquier celebración en un encuentro extraordinario.", price:90, min:20, unit:"persona", photo:"fotos/grazing-table/card.jpg", gallery:pics("grazing-table",6),
+   incl:["Mesa de charcutería con quesos, charcutería premium, frutas frescas y acompañamientos gourmet.","Selecciones y adicionales personalizados según tus preferencias y el estilo de tu evento.","Montaje y desmontaje de la mesa."],
+   info:[]},
+  {id:"experience", name:"The Experience", desc:"Una experiencia para crear, compartir y disfrutar. Aprende a armar tu propia tabla de charcutería y celebra alrededor de algo delicioso, hecho por ustedes.", price:150, min:5, photo:"fotos/experience/card.jpg", gallery:pics("experience",8),
+   incl:["Mínimo 5 unidades de The Single.","Una clase guiada de una hora para aprender a armar una tabla de charcutería, sin costo adicional.","Un momento para crear juntos y disfrutar de sus tablas mientras comparten."],
+   info:[], note:"Ideal para cumpleaños, reuniones entre amigos, celebraciones especiales o simplemente para hacer algo diferente."}
 ];
 /* ===================================== */
 
@@ -53,8 +79,9 @@ function pageUrl(params){
   return location.origin + location.pathname + (q ? "?" + q : "");
 }
 
-const priceTxt = p => p.price ? money(p.price) + (p.min ? " c/u" : "") : "Precio según tu pedido";
-const minTxt = p => p.min ? `<div class="minq">Pedido mínimo: ${p.min} unidades</div>` : "";
+const unitsTxt = (p, n) => n === 1 ? (p.unit ? "1 " + p.unit : "1 unidad") : n + (p.unit ? " " + p.unit + "s" : " unidades");
+const priceTxt = p => p.price ? money(p.price) + (p.unit ? " por " + p.unit : p.min ? " c/u" : "") : "Precio según tu pedido";
+const minTxt = p => p.min ? `<div class="minq">Pedido mínimo: ${unitsTxt(p, p.min)}</div>` : "";
 const titleHtml = n => /^The /.test(n) ? `<span class="ttl"><span class="the" role="img" aria-label="The"></span><span>${esc(n.slice(4))}</span></span>` : esc(n);
 const qtyHtml = p => `<div class="qty"><button type="button" data-chg="${p.id}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><span data-q="${p.id}">0</span><button type="button" data-chg="${p.id}" data-d="1" aria-label="Agregar ${esc(p.name)}">+</button>`;
 
@@ -77,13 +104,15 @@ function detailHtml(p){
 ${g.length > 1 ? `<button type="button" class="nav prev" data-gal="-1" aria-label="Foto anterior">‹</button><button type="button" class="nav next" data-gal="1" aria-label="Foto siguiente">›</button>
 <div class="thumbs" id="thumbs">${g.map((f, i) => `<button type="button" data-th="${i}" aria-label="Ver foto ${i + 1}"><img src="${ROOT}${esc(f)}" alt="" loading="lazy"></button>`).join("")}</div>` : ""}`
     : `<div class="gal ph0"><div class="ph">Foto próximamente</div></div>`;
-  const incl = p.incl && p.incl.length
+  const incl = Array.isArray(p.incl) && p.incl.length
     ? `<ul>${p.incl.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`
+    : p.incl ? `<p>${esc(p.incl)}</p>`
     : `<p class="mut">El detalle de lo que incluye lo confirmamos por chat.</p>`;
+  const info = (p.info || []).length ? `<p class="spec">${p.info.map(([k, v]) => `<b>${esc(k)}:</b> ${esc(v)}`).join("<br>")}</p>` : "";
   return `<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt"><button type="button" class="x" data-close aria-label="Cerrar">×</button>
 <div class="dg">${gal}</div>
 <div class="di"><h2 id="dt">${titleHtml(p.name)}</h2><div class="price">${priceTxt(p)}</div>${minTxt(p)}<p>${esc(p.desc)}</p>
-<h3>Qué incluye</h3>${incl}
+<h3>Qué incluye</h3>${incl}${info}${p.note ? `<p>${esc(p.note)}</p>` : ""}
 ${qtyHtml(p)}<button type="button" class="lnk" data-link="${p.id}">Copiar link</button></div>
 <a class="btn btn-line2" target="_blank" rel="noopener" href="${wa("Hola Gatherings, quisiera información sobre " + p.name + ".")}">Preguntar por este producto</a>
 <a class="btn btn-wa" href="#pedido" data-close>Ir a mi pedido</a></div></div>`;
@@ -121,12 +150,12 @@ function closeDetail(fromPop){
 function lines(){ return PRODUCTS.filter(p => cart[p.id]).map(p => ({p, n: cart[p.id]})); }
 
 function render(){
-  const L = lines(), n = L.reduce((a,x) => a + x.n, 0);
+  const L = lines(), n = L.reduce((a,x) => a + (x.p.unit ? 1 : x.n), 0);   /* por persona = 1 producto */
   const known = L.length && L.every(x => x.p.price), tot = L.reduce((a,x) => a + (x.p.price||0) * x.n, 0);
   document.querySelectorAll("[data-q]").forEach(e => { e.textContent = cart[e.dataset.q] || 0; });
   $("#cart").classList.toggle("on", n > 0);
   $("#cartTxt").textContent = n + (n === 1 ? " producto" : " productos") + (known && tot ? " · " + money(tot) : "");
-  $("#sum").innerHTML = n ? L.map(x => `${x.n} × ${esc(x.p.name)}`).join("<br>") : "Aún no has agregado nada. También puedes escribirnos directo para cotizar un evento.";
+  $("#sum").innerHTML = n ? L.map(x => `${x.p.unit ? unitsTxt(x.p, x.n) : x.n} × ${esc(x.p.name)}`).join("<br>") : "Aún no has agregado nada. También puedes escribirnos directo para cotizar un evento.";
   $("#saveBox").hidden = !n;
 }
 
@@ -154,7 +183,7 @@ function copy(text, okMsg){
 function send(e){
   e.preventDefault();
   const f = new FormData($("#f")), L = lines();
-  const items = L.length ? L.map(x => `• ${x.n} × ${x.p.name}${x.p.price ? " (" + money(x.p.price * x.n) + ")" : " (precio por confirmar)"}`).join("\n") : "• (sin productos: quiero cotizar)";
+  const items = L.length ? L.map(x => `• ${x.p.unit ? unitsTxt(x.p, x.n) : x.n} × ${x.p.name}${x.p.price ? " (" + money(x.p.price * x.n) + ")" : " (precio por confirmar)"}`).join("\n") : "• (sin productos: quiero cotizar)";
   const tot = L.length && L.every(x => x.p.price) ? "\nSubtotal tablas: " + money(L.reduce((a,x) => a + x.p.price * x.n, 0)) + " (envío aparte, Q35–Q45)" : "";
   const t = `Hola Gatherings, quiero hacer un pedido:\n${items}${tot}\n\nNombre: ${f.get("nombre")}\nFecha: ${f.get("fecha")}\nHorario de entrega: ${f.get("horario")}\nDirección: ${f.get("dir") || "-"}\nMensaje personalizado: ${f.get("mensaje") || "-"}\nNotas: ${f.get("notas") || "-"}`;
   window.open(wa(t), "_blank", "noopener");

@@ -39,3 +39,11 @@
 .ttl{display:inline-flex;align-items:baseline;justify-content:center;gap:.1em;text-transform:uppercase;letter-spacing:.04em}
 .ttl .the{display:inline-block;flex:none;width:2.05em;height:1.37em;background:currentColor;-webkit-mask:url(brand/the-azul.png) center/contain no-repeat;mask:url(brand/the-azul.png) center/contain no-repeat}
 .minq{font:13px var(--sans);color:var(--navy);margin:2px 0 4px}
+
+/* Descripciones, «Qué incluye», tamaño y porciones: Gotham Narrow (los títulos siguen en Rossten). */
+.card p,.di p,.di li,.di .spec{font-family:var(--sans)}
+.card p{font-size:15px}
+.di p,.di li{font-size:16px;line-height:1.5}
+.di .spec{margin:10px 0;color:var(--ink)}
+.di .spec b{color:var(--navy)}
+.di ul li{margin:0 0 4px}
