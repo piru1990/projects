@@ -1,6 +1,6 @@
 from odoo import fields, models
 
-PAGO_POR_DEFECTO = ("Para confirmar tu pedido se requiere un anticipo. Respóndenos a este correo o escríbenos por WhatsApp "
+PAGO_POR_DEFECTO = ("Para confirmar tu pedido se requiere un anticipo del 50 %. Respóndenos a este correo o escríbenos por WhatsApp "
                     "y te indicamos cómo realizarlo.")
 
 
