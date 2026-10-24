@@ -1,0 +1,38 @@
+# Publica gatheringsgt/ en Cloudflare Pages (proyecto gatheringsgt, Production) con cada merge a main.
+# Secretos de GitHub necesarios: CLOUDFLARE_API_TOKEN (permiso Cloudflare Pages: Edit) y CLOUDFLARE_ACCOUNT_ID.
+# Las variables y secretos del sitio (Odoo, Turnstile) siguen guardados en el proyecto de Pages.
+name: Desplegar sitio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "gatheringsgt/**"
+      - "tests/site/**"
+      - ".github/workflows/desplegar-sitio.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: desplegar-sitio
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pruebas del sitio
+        run: node --test tests/site/cotizar.test.mjs
+      - name: Publicar en Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy gatheringsgt --project-name=gatheringsgt --branch=main --commit-dirty=true
