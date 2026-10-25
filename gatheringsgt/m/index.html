@@ -94,16 +94,16 @@ footer .social{flex-wrap:wrap;row-gap:10px;gap:16px}
     <form id="f">
       <label>Nombre y Apellido<input name="nombre" required autocomplete="name"></label>
       <label>Correo electrónico (te enviamos la cotización)<input name="correo" type="email" autocomplete="email" inputmode="email"></label>
-      <label>Teléfono o WhatsApp<input name="telefono" type="tel" autocomplete="tel" inputmode="tel"></label>
+      <label>Teléfono o WhatsApp<input name="telefono" type="tel" required autocomplete="tel" inputmode="tel"></label>
       <label>Fecha del evento o entrega<input name="fecha" type="date" required></label>
       <label>Horario de entrega<select name="horario" required><option value="" disabled selected>Elige una opción</option><option>Durante la mañana</option><option>Durante la tarde</option></select></label>
-      <label>Zona y dirección exacta<textarea name="dir" rows="2" placeholder="Zona, colonia, referencias"></textarea></label>
+      <label>Zona y dirección exacta<textarea name="dir" rows="2" required placeholder="Zona, colonia, referencias"></textarea></label>
       <label>Mensaje personalizado (detalla el mensaje especial que quieres que lleve tu producto)<textarea name="mensaje" rows="2"></textarea></label>
       <label>Notas (alergias, personas, ocasión)<textarea name="notas" rows="2"></textarea></label>
       <div class="hp" aria-hidden="true"><label>Empresa<input name="empresa" tabindex="-1" autocomplete="off"></label></div>
       <div id="ts"></div>
       <button class="btn btn-quote" type="submit" data-via="quote">Recibir cotización por correo</button>
-      <button class="btn btn-wa btn-ico" type="submit" data-via="wa" aria-label="Enviar pedido por WhatsApp">Enviar pedido por WhatsApp <svg class="wai" aria-hidden="true"><use href="#wa"/></svg></button>
+      <button class="btn btn-wa btn-ico" type="submit" data-via="wa" aria-label="Finalizar pedido">Finalizar pedido <svg class="wai" aria-hidden="true"><use href="#wa"/></svg></button>
       <p class="qmsg" id="qmsg" role="status" aria-live="polite"></p>
       <p class="note">No se cobra nada en la página: la cotización llega a tu correo. Tu pedido queda guardado en este teléfono.</p>
     </form>
