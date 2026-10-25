@@ -25,6 +25,7 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 
 ## Cotización por correo (Odoo)
 - El formulario tiene dos botones: «Recibir cotización por correo» (usa `POST /api/cotizar`, en `_worker.js`) y «Finalizar pedido» (envía el pedido por chat; el botón de la barra inferior hace lo mismo). Nombre, teléfono, fecha, horario y dirección son obligatorios. El Worker manda a Odoo solo producto y cantidad más los datos del formulario; Odoo pone precios y mínimos, crea la cotización y se la envía al cliente. Si Odoo no responde, se ofrece el enlace a WhatsApp con el pedido.
+- Anticipo mínimo de 12 horas (hora de Guatemala, UTC-6): «Durante la mañana» cuenta desde las 8:00 y «Durante la tarde» desde las 13:00. El formulario (`refreshSlots` en `assets/shared.js`) no deja elegir fechas u horarios que no lo cumplan y `_worker.js` lo vuelve a validar. Si se cambian las horas, hay que cambiarlas en ambos archivos.
 - Variables, secretos de Pages, Service Token de Access y Turnstile (`TURNSTILE_KEY` en `assets/shared.js`): ver `odoo/addons/gatherings_cotizacion/README.md`. Pruebas: `node --test tests/site/cotizar.test.mjs`.
 - Si cambias un precio, mínimo o producto, actualiza también `odoo/addons/gatherings_cotizacion/catalogo.py` (el test `odoo/tests/test_cotizacion_catalogo.py` avisa si quedan distintos).
 

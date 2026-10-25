@@ -231,9 +231,35 @@ async function quote(f, L){
   }
 }
 
+/* Anticipo mínimo: cada horario cuenta desde su hora de inicio (hora de Guatemala, UTC-6 sin cambio de hora). */
+const GT_OFFSET_H = 6, ANTICIPO_H = 12, SLOTS = {"Durante la mañana": 8, "Durante la tarde": 13};
+const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
+function slotOk(fecha, horario, now = Date.now()){
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha || "") || !Object.prototype.hasOwnProperty.call(SLOTS, horario)) return false;
+  const h = SLOTS[horario];
+  return Date.parse(fecha + "T00:00:00Z") + (h + GT_OFFSET_H) * 36e5 - now >= ANTICIPO_H * 36e5;
+}
+/* Primer día con algún horario disponible y habilitación de horarios según la fecha elegida. */
+function refreshSlots(){
+  const form = $("#f"), fecha = form.elements.fecha, sel = form.elements.horario, now = Date.now();
+  let d = now - GT_OFFSET_H * 36e5;
+  while (!Object.keys(SLOTS).some(h => slotOk(isoDay(d), h, now))) d += 864e5;
+  fecha.min = isoDay(d);
+  [...sel.options].filter(o => o.value).forEach(o => {
+    o.disabled = !!fecha.value && !slotOk(fecha.value, o.value, now);
+    o.textContent = o.value + (o.disabled ? " (no disponible)" : "");
+  });
+  if (sel.selectedOptions[0] && sel.selectedOptions[0].disabled) sel.value = "";
+}
+
 function send(e){
   e.preventDefault();
   const f = new FormData($("#f")), L = lines();
+  refreshSlots();
+  if (!slotOk(f.get("fecha"), f.get("horario"))){
+    $("#f").elements.fecha.focus(); say("Necesitamos al menos 12 horas de anticipación: elige otra fecha u horario.", "err");
+    return false;
+  }
   if (e.submitter && e.submitter.dataset.via === "quote"){ quote(f, L); return false; }
   window.open(wa(waText(f, L)), "_blank", "noopener");
   return false;
@@ -259,6 +285,10 @@ function init(){
     new FormData(form).forEach((v,k) => { d[k] = v; });
     store.set(FORM_KEY, d);
   });
+  [...form.elements.horario.options].forEach(o => { if (!o.hasAttribute("value")) o.value = o.text; });   /* el texto cambia a «no disponible»; el valor no */
+  refreshSlots();
+  form.elements.fecha.addEventListener("change", refreshSlots);
+  form.addEventListener("focusin", refreshSlots);
   form.addEventListener("submit", send);
   /* «Finalizar pedido» (barra inferior) hace lo mismo que el botón verde del formulario (también «Finalizar pedido»): valida y lleva al primer campo faltante */
   $("#finish").addEventListener("click", () => form.requestSubmit(form.querySelector("[data-via=wa]")));
