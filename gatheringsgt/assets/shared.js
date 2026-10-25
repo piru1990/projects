@@ -260,7 +260,7 @@ function init(){
     store.set(FORM_KEY, d);
   });
   form.addEventListener("submit", send);
-  /* «Finalizar pedido» (barra inferior) hace lo mismo que «Enviar pedido por WhatsApp»: valida y lleva al primer campo faltante */
+  /* «Finalizar pedido» (barra inferior) hace lo mismo que el botón verde del formulario (también «Finalizar pedido»): valida y lleva al primer campo faltante */
   $("#finish").addEventListener("click", () => form.requestSubmit(form.querySelector("[data-via=wa]")));
   form.addEventListener("focusin", loadTurnstile, {once: true});
 

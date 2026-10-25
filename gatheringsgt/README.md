@@ -24,7 +24,7 @@ La persona puede forzar una versión con el link «Ver versión móvil / de escr
 - Plan B (a mano): Cloudflare → Workers & Pages → gatheringsgt → Create deployment → subir un zip con **toda esta carpeta** (`index.html`, `m/`, `assets/` y las fotos) como Production. Las variables y secretos del proyecto no cambian con ninguno de los dos métodos.
 
 ## Cotización por correo (Odoo)
-- El formulario tiene dos botones: «Recibir cotización por correo» (usa `POST /api/cotizar`, en `_worker.js`) y «Enviar pedido por WhatsApp» (como antes). El Worker manda a Odoo solo producto y cantidad más los datos del formulario; Odoo pone precios y mínimos, crea la cotización y se la envía al cliente. Si Odoo no responde, se ofrece el enlace a WhatsApp con el pedido.
+- El formulario tiene dos botones: «Recibir cotización por correo» (usa `POST /api/cotizar`, en `_worker.js`) y «Finalizar pedido» (envía el pedido por chat; el botón de la barra inferior hace lo mismo). Nombre, teléfono, fecha, horario y dirección son obligatorios. El Worker manda a Odoo solo producto y cantidad más los datos del formulario; Odoo pone precios y mínimos, crea la cotización y se la envía al cliente. Si Odoo no responde, se ofrece el enlace a WhatsApp con el pedido.
 - Variables, secretos de Pages, Service Token de Access y Turnstile (`TURNSTILE_KEY` en `assets/shared.js`): ver `odoo/addons/gatherings_cotizacion/README.md`. Pruebas: `node --test tests/site/cotizar.test.mjs`.
 - Si cambias un precio, mínimo o producto, actualiza también `odoo/addons/gatherings_cotizacion/catalogo.py` (el test `odoo/tests/test_cotizacion_catalogo.py` avisa si quedan distintos).
 
