@@ -30,6 +30,11 @@ const PRODUCTS = {
 const API_COTIZAR = "/api/cotizar";
 const MAX_BODY = 8192;
 const CAMPOS_TEXTO = ["nombre", "correo", "telefono", "fecha", "horario", "dir", "mensaje", "notas"];
+/* Anticipo mínimo de 12 horas desde el inicio del horario, en hora de Guatemala (UTC-6, sin cambio de hora); igual que en shared.js. */
+const ANTICIPO_H = 12, GT_OFFSET_H = 6, SLOTS = { "Durante la mañana": 8, "Durante la tarde": 13 };
+const slotOk = (fecha, horario, now = Date.now()) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(fecha) && Object.prototype.hasOwnProperty.call(SLOTS, horario) &&
+  Date.parse(fecha + "T00:00:00Z") + (SLOTS[horario] + GT_OFFSET_H) * 36e5 - now >= ANTICIPO_H * 36e5;
 let odooUid = null;   // se reutiliza mientras viva el aislamiento del Worker
 
 const jsonRes = (obj, status = 200) => new Response(JSON.stringify(obj), {
@@ -89,6 +94,9 @@ async function cotizar(request, env) {
   if (!body || typeof body !== "object" || !Array.isArray(body.items)) return jsonRes({ ok: false, error: "Solicitud inválida." }, 400);
 
   if (body.empresa) return jsonRes({ ok: true, estado: "revision", cotizacion: "" });   // campo trampa: un humano no lo llena
+  if (!slotOk(String(body.fecha || "").trim(), String(body.horario || "").trim())) {
+    return jsonRes({ ok: false, error: "Necesitamos al menos 12 horas de anticipación: elige otra fecha u horario." }, 400);
+  }
   if (!(await turnstileOk(env, body.turnstile, request.headers.get("cf-connecting-ip")))) {
     return jsonRes({ ok: false, error: "No pudimos verificar que eres una persona. Recarga la página e inténtalo de nuevo." }, 400);
   }
