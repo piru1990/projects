@@ -153,7 +153,7 @@ def _telefono(v) -> str | None:
 
 
 _CAT = json.loads((Path(__file__).resolve().parent.parent / "catalog.json").read_text(encoding="utf-8"))
-# nombre sin «The», en minúsculas -> sku, y su precio de lista (con IVA)
+# nombre sin «The», en minúsculas -> sku, y su precio de lista (final)
 CATALOGO = {re.sub(r"^the\s+", "", quitar_acentos(p["nombre"]).casefold()): p["sku"] for p in _CAT["productos"]}
 PRECIOS = {p["sku"]: p["precio"] for p in _CAT["productos"]}
 ALIAS = _CAT["alias"]

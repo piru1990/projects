@@ -41,14 +41,14 @@ Qué hace con el Excel real (111 pedidos, 27 nov 2025 a 14 oct 2026, Q73,930, ig
 - `SUBTOTAL` es el precio unitario; si el TOTAL de la hoja no cuadra (pedido 41), manda el TOTAL de la hoja.
 - Crea el catálogo (`catalog.json`: SKU `GT-SINGLE`, `GT-COZY`, ...), clientes (79, unidos por nombre sin acentos ni mayúsculas) y pedidos `GT-0001`...
 - 16 pedidos tenían producto en texto libre. Con los datos disponibles se resolvieron 7: «Cozy Box», «Little Dome» y «Experience» son productos de catálogo (alias en `catalog.json`) y un combo cobrado por debajo de la lista se parte en sus productos más una línea `GT-DESCUENTO` negativa. Quedan 9 en texto libre (línea «Otros productos (histórico)» con el texto original y la nota «Revisar:») a la espera del Excel de costos de Andrea: #8, 11, 43, 70, 71, 90, 100, 106, 109.
-- **IVA:** los precios del catálogo y de la hoja ya incluyen IVA 12 %. Existe el impuesto «IVA 12% (incluido)» (precio con impuesto incluido), por defecto en la compañía, los productos y las líneas; los totales no cambian. Supuesto a confirmar con el contador.
+- **Impuestos (desde 2026-10-29):** Gatherings es pequeño contribuyente (5 % sobre ventas): los precios son finales y las líneas de pedidos y cotizaciones **no llevan impuesto**; el 5 % es un costo del negocio, no una línea para el cliente. Antes se usó «IVA 12% (incluido)»; `scripts/regimen_5.py` lo quitó de pedidos, productos y compañía y lo archivó, sin cambiar ningún total.
 - `load --apply --refresh` reescribe las líneas de pedidos ya cargados (pasa el pedido a borrador, cambia líneas, lo confirma de nuevo) sin duplicar ni mover inventario. Haga un respaldo antes.
 - Pedidos históricos entran confirmados sin generar entregas, para no mover el inventario. Pago, entrega, dirección y facturación quedan en la nota del pedido.
 
 ## Estado de la verificación
 Corrido contra un Odoo 18 real en la Mac mini (Colima) el 2026-10-14/15: 7 productos, 79 clientes y 111 pedidos `GT-0001`..`GT-0111`, suma Q73,930.00; la segunda corrida omite los 111 (idempotente). La primera carga reveló dos cosas que las pruebas con Odoo simulado no podían ver, ya corregidas en el importador:
 - **Moneda:** Odoo crea la base en USD y los pedidos heredan esa moneda. El importador (`moneda()`) deja la compañía y las listas de precios en GTQ antes de crear pedidos.
-- **Impuestos:** Odoo agrega un impuesto de venta por defecto (15 %) a cada línea, lo que sube el total a Q85,019.50. Se resolvió dejando el IVA 12 % como impuesto incluido en el precio (ver arriba); el TOTAL de la hoja manda. El plan contable queda genérico hasta hablar con el contador.
+- **Impuestos:** Odoo agrega un impuesto de venta por defecto (15 %) a cada línea, lo que sube el total a Q85,019.50. Se resolvió dejando las líneas sin impuesto (ver arriba); el TOTAL de la hoja manda. El plan contable queda genérico hasta hablar con el contador.
 Los campos usados son los de Odoo 18 (`type=consu` + `is_storable`). Pruebas: `python3 -m pytest importer/tests` (Odoo simulado y Excel sintético).
 
 ## Cotizaciones desde el sitio web
@@ -71,3 +71,6 @@ python3 importer/import_costs.py load  odoo/data/Costos.xlsx --apply   # crea (r
 ## Falta (siguientes pasos)
 - Proveedores: la hoja de costos no trae nombres.
 - Parte C: formularios de captura para Andrea/el personal, y subdominios por producto (SKU).
+
+## Cambiar de IVA 12 % a pequeño contribuyente
+`python3 scripts/regimen_5.py` simula; con `--apply` quita «IVA 12% (incluido)» de las líneas (también de pedidos confirmados), de los productos y del impuesto por defecto de la compañía, y archiva el impuesto. Verifica que la suma de los pedidos no cambie y que no quede impuesto; si no, termina con error (restaure el respaldo). Es idempotente. Después: `docker compose run --rm odoo odoo -d gatherings -u gatherings_cotizacion --stop-after-init` y `docker compose restart odoo`, para que el PDF y el correo dejen de decir «IVA incluido».

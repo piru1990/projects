@@ -4,12 +4,12 @@
   python3 import_sales.py check  RUTA.xlsx            # solo lee y reporta (no toca Odoo)
   python3 import_sales.py load   RUTA.xlsx            # simula (dry-run) contra Odoo
   python3 import_sales.py load   RUTA.xlsx --apply    # crea catálogo, clientes y pedidos
-  python3 import_sales.py load   RUTA.xlsx --apply --refresh   # además reescribe líneas e IVA de pedidos ya cargados
+  python3 import_sales.py load   RUTA.xlsx --apply --refresh   # además reescribe líneas de pedidos ya cargados
 
 Conexión por variables de entorno: ODOO_URL, ODOO_DB, ODOO_USER, ODOO_PASSWORD.
 Es idempotente: pedidos (GT-0001...), productos (default_code) y clientes (nombre exacto) que ya existen se omiten
 (con --refresh, los pedidos existentes se reescriben: líneas, producto, impuesto y nota).
-Los precios del negocio incluyen IVA (12 %): las líneas llevan el impuesto «IVA 12% (incluido)», así el TOTAL no cambia.
+Régimen de pequeño contribuyente (5 %): los precios son finales y las líneas no llevan impuesto, así el TOTAL no cambia.
 Los pedidos históricos se crean ya confirmados (state=sale) sin pasar por action_confirm, así que no generan
 entregas ni mueven inventario; el cobro y la entrega quedan en la nota del pedido.
 """
@@ -59,12 +59,11 @@ def nota(p: Pedido) -> str:
 class Cargador:
     def __init__(self, rpc, aplicar: bool, refrescar: bool = False):
         self.rpc, self.aplicar, self.refrescar = rpc, aplicar, refrescar
-        self.iva_id: int | None = None
         self.productos: dict[str, int] = {}   # sku -> product.product id
         self.clientes: dict[str, int] = {}    # clave -> res.partner id
         self.etiquetas: dict[str, int] = {}
         self.contador = {"productos": 0, "clientes": 0, "pedidos": 0, "omitidos": 0, "moneda": 0,
-                         "actualizados": 0, "iva": 0}
+                         "actualizados": 0}
 
     def _buscar_o_crear(self, modelo: str, dominio: list, vals: dict, clave: str) -> int | None:
         ids = self.rpc.search(modelo, dominio, limit=1)
@@ -75,41 +74,23 @@ class Cargador:
             return None
         return self.rpc.create(modelo, vals)
 
-    def iva(self, cat: dict) -> None:
-        """Impuesto de venta «IVA 12% (incluido)»: los precios de la hoja y del catálogo ya traen IVA. Se deja también
-        como impuesto de venta por defecto de la compañía, para pedidos y productos nuevos."""
-        cfg = cat["iva"]
-        dom = [("name", "=", cfg["nombre"]), ("type_tax_use", "=", "sale")]
-        campos = self.rpc.call("account.tax", "fields_get", [], attributes=["type"])
-        # Odoo 18 usa price_include_override ('tax_included'); versiones anteriores, price_include (bool)
-        incluido = {"price_include_override": "tax_included"} if "price_include_override" in campos else {"price_include": True}
-        vals = {"name": cfg["nombre"], "amount": cfg["porcentaje"], "amount_type": "percent", "type_tax_use": "sale",
-                **incluido}
-        self.iva_id = self._buscar_o_crear("account.tax", dom, vals, "iva")
-        if self.iva_id and self.aplicar:
-            empresa = self.rpc.call("res.company", "search", [], limit=1)
-            if empresa and "account_sale_tax_id" in self.rpc.call("res.company", "fields_get", [], attributes=["type"]):
-                self.rpc.call("res.company", "write", empresa, {"account_sale_tax_id": self.iva_id})
-
     def _impuesto(self) -> dict:
-        return {"tax_id": [(6, 0, [self.iva_id] if self.iva_id else [])]}
+        # pequeño contribuyente (5 %): el precio es final y las líneas no llevan impuesto. Sin esto Odoo pone el 15 % genérico.
+        return {"tax_id": [(6, 0, [])]}
 
     def catalogo(self) -> None:
         cat = json.loads(CATALOGO_JSON.read_text(encoding="utf-8"))
-        self.iva(cat)
         items = [(p["sku"], p["nombre"], p["precio"], "consu") for p in cat["productos"]]
         items += [(s["sku"], s["nombre"], 0, "service") for s in cat["servicios"]]
         items.append((cat["historico"]["sku"], cat["historico"]["nombre"], 0, "service"))
         for sku, nombre, precio, tipo in items:
             vals = {"name": nombre, "default_code": sku, "list_price": precio, "type": tipo,
                     "sale_ok": True, "purchase_ok": tipo == "consu",
-                    "taxes_id": [(6, 0, [self.iva_id] if self.iva_id else [])]}
+                    "taxes_id": [(6, 0, [])]}
             if tipo == "consu":
                 vals["is_storable"] = True  # Odoo 18: producto almacenable (Inventario)
             tmpl = self._buscar_o_crear("product.template", [("default_code", "=", sku)], vals, "productos")
             if tmpl:
-                if self.iva_id and self.aplicar:  # productos creados antes de definir el IVA
-                    self.rpc.call("product.template", "write", [tmpl], {"taxes_id": [(6, 0, [self.iva_id])]})
                 self.productos[sku] = self.rpc.search("product.product", [("product_tmpl_id", "=", tmpl)], limit=1)[0]
 
     def etiqueta(self, nombre: str) -> int | None:

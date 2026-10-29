@@ -6,7 +6,7 @@ const WA = "50255412293";          // +502 5541 2293
 const CURRENCY = "Q";
 const API_COTIZAR = "/api/cotizar";   // POST: Odoo crea la cotización y se la envía al cliente (ver _worker.js)
 const TURNSTILE_KEY = "0x4AAAAAAFi5dZKAr9CTywNw";   // clave pública del widget Cloudflare Turnstile; vacío = sin verificación (el Worker la exige si tiene TURNSTILE_SECRET)
-/* price: número en quetzales (IVA incluido), o null para "Cotizar". min: pedido mínimo de unidades (opcional).
+/* price: número en quetzales (precio final), o null para "Cotizar". min: pedido mínimo de unidades (opcional).
    photo: foto de la tarjeta, ruta desde la raíz del sitio; vacío = recuadro «Foto próximamente».
    gallery: fotos del detalle (la primera es la principal).  incl: «Qué incluye» (texto, o lista de viñetas; vacío = se confirma por WhatsApp).
    info: líneas «Tamaño», «Porciones» o «Presentación» ([[etiqueta, valor], ...]).  unit: unidad del precio si no es «c/u» (ej. "persona").  note: texto final del detalle. */

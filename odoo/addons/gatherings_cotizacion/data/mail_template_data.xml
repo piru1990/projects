@@ -29,7 +29,7 @@
             </tr>
           </t>
           <tr>
-            <td style="padding:12px 0;border-top:2px solid #4EB969;"><strong>Total (IVA incluido)</strong></td>
+            <td style="padding:12px 0;border-top:2px solid #4EB969;"><strong>Total</strong></td>
             <td align="right" style="padding:12px 0;border-top:2px solid #4EB969;white-space:nowrap;"><strong><t t-out="format_amount(object.amount_total, object.currency_id)"/></strong></td>
           </tr>
         </table>

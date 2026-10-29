@@ -11,21 +11,9 @@ _logger = logging.getLogger(__name__)
 PIE = "WhatsApp +502 5541-2293 · hola@gatheringsgt.com · gatheringsgt.com"
 
 
-def _iva(env):
-    Tax = env["account.tax"]
-    tax = Tax.search([("name", "=", catalogo.IVA["nombre"]), ("type_tax_use", "=", "sale")], limit=1)
-    if not tax:
-        # Odoo 18 usa price_include_override ('tax_included'); versiones anteriores, price_include (bool)
-        incluido = {"price_include_override": "tax_included"} if "price_include_override" in Tax._fields else {"price_include": True}
-        tax = Tax.create({"name": catalogo.IVA["nombre"], "amount": catalogo.IVA["porcentaje"], "amount_type": "percent",
-                          "type_tax_use": "sale", **incluido})
-    return tax
-
-
 def _productos(env):
     """Crea o actualiza los productos del catálogo oficial (por SKU). No toca pedidos ya hechos: sus líneas guardan su precio."""
     Template = env["product.template"]
-    iva = _iva(env)
     for p in catalogo.PRODUCTOS:
         vals = {
             "list_price": p["precio"],
@@ -39,7 +27,7 @@ def _productos(env):
             tmpl.write(vals)
         else:
             nuevo = {**vals, "name": p["nombre"], "default_code": p["sku"], "type": "consu", "sale_ok": True,
-                     "purchase_ok": "purchase_ok" in Template._fields, "taxes_id": [(6, 0, iva.ids)]}
+                     "purchase_ok": "purchase_ok" in Template._fields, "taxes_id": [(6, 0, [])]}
             if "is_storable" in Template._fields:  # Odoo 18 con Inventario: producto almacenable, como el importador
                 nuevo["is_storable"] = True
             Template.create(nuevo)

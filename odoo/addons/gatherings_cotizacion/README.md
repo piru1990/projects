@@ -8,7 +8,7 @@ Formulario (index.html / m/index.html)
         └─ JSON-RPC a erp.gatheringsgt.com  (Service Token de Cloudflare Access + llave API del usuario «web-cotizaciones»)
              └─ sale.order.gt_web_quote()  (este addon)
                   ├─ crea/reutiliza el cliente (por correo), la cotización (7 días de validez) y un lead en CRM
-                  ├─ precios oficiales IVA incluido: los pone Odoo, el sitio solo manda producto + cantidad
+                  ├─ precios oficiales finales (sin impuesto aparte): los pone Odoo, el sitio solo manda producto + cantidad
                   ├─ envío automático (correo + PDF adjunto, copia a hola@) si todo es de precio fijo y cumple el mínimo
                   └─ si no (The Tailored, The Experience, The Grazing Table, menos del mínimo, mucho tráfico o falla el correo):
                        queda en borrador, el cliente recibe un acuse y Andrea una actividad + correo para revisarla
@@ -18,7 +18,7 @@ Si Odoo no responde, el sitio muestra un enlace a WhatsApp con el pedido (el cli
 
 ## Qué instala
 - Campos en producto: `gt_web_id` (id en el sitio), `gt_min_qty`, `gt_unit_label`, `gt_quote_mode` («Precio fijo» o «Requiere revisión»), y en la cotización los datos de entrega.
-- Al instalar (`post_init_hook`): productos oficiales por SKU (precios, mínimos y modo; crea los que falten: Little Box, Celebration Box, Mini Dome, Big Dome, Glass Dome, Grazing Table), IVA 12 % incluido, logo/colores/pie de la compañía, `report.url = http://localhost:8069` (ver abajo) y el quetzal con el símbolo adelante. **Los pedidos ya hechos no cambian**: sus líneas guardan su precio.
+- Al instalar (`post_init_hook`): productos oficiales por SKU (precios, mínimos y modo; crea los que falten: Little Box, Celebration Box, Mini Dome, Big Dome, Glass Dome, Grazing Table), sin impuesto en las líneas (pequeño contribuyente 5 %), logo/colores/pie de la compañía, `report.url = http://localhost:8069` (ver abajo) y el quetzal con el símbolo adelante. **Los pedidos ya hechos no cambian**: sus líneas guardan su precio.
 - Informe «Cotización Gatherings» (PDF, texto fijo en español, Rossten + Barlow Semi Condensed, azul/menta/verde) y dos correos: «Cotización del sitio web» y «Pedido recibido, en revisión». Los correos no llevan enlaces al portal de Odoo (está detrás de Cloudflare Access) y cargan el logo desde gatheringsgt.com.
 - Catálogo oficial en `catalogo.py`. Un test (`odoo/tests/test_cotizacion_catalogo.py`) falla si difiere de `assets/shared.js` o de `_worker.js`.
 
