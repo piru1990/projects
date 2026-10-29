@@ -3,6 +3,8 @@ from datetime import timedelta
 from odoo import fields
 from odoo.tests import TransactionCase, tagged
 
+from .. import catalogo
+
 
 @tagged("post_install", "-at_install")
 class TestWebQuote(TransactionCase):
@@ -30,7 +32,7 @@ class TestWebQuote(TransactionCase):
         self.assertEqual(precios["homestyle"], 500)
         self.assertEqual(precios["gathering"], 800)
         self.assertEqual(precios["grazing-table"], 90)
-        self.assertEqual(len(precios), 12)
+        self.assertEqual(len(precios), len(catalogo.PRODUCTOS))
 
     def test_pedido_fijo_se_envia_solo(self):
         r = self.Order.gt_web_quote(self.pedido([{"id": "single", "qty": 2}, {"id": "little-box", "qty": 5}]))
@@ -43,9 +45,9 @@ class TestWebQuote(TransactionCase):
         self.assertEqual(orden.partner_id.email, "ana@example.com")
         self.assertEqual(orden.validity_date, fields.Date.today() + timedelta(days=7))
         self.assertEqual(len(self.mensajes(orden)), 1)
-        # los precios en la línea son los de Odoo con IVA incluido
+        # pequeño contribuyente: el precio de Odoo es el total, sin impuesto aparte
         self.assertEqual(orden.amount_total, 625)
-        self.assertEqual(round(orden.amount_tax, 2), round(625 - 625 / 1.12, 2))
+        self.assertEqual(orden.amount_tax, 0)
 
     def test_lead_creado(self):
         r = self.Order.gt_web_quote(self.pedido([{"id": "cozy", "qty": 1}]))
@@ -119,7 +121,9 @@ class TestWebQuote(TransactionCase):
         orden = self.Order.search([("name", "=", r["cotizacion"])])
         html = self.env["ir.actions.report"]._render_qweb_html("gatherings_cotizacion.report_cotizacion", orden.ids)[0].decode()
         self.assertIn(orden.name, html)
-        self.assertIn("Total (IVA incluido)", html)
+        self.assertIn("Total", html)
+        self.assertNotIn("IVA incluido", html)
+        self.assertNotIn("incluyen IVA", html)
         self.assertIn("The Cozy", html)
 
     def test_texto_de_pago_editable(self):

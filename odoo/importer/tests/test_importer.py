@@ -131,14 +131,13 @@ def test_carga_real_e_idempotente(excel):
     assert c1["pedidos"] == 6 and len(odoo.t["sale.order"]) == 6 and len(odoo.t["res.partner"]) == 4
     o1 = next(o for o in odoo.t["sale.order"] if o["name"] == "GT-0001")
     assert o1["state"] == "sale" and o1["date_order"] == "2025-11-27 18:00:00" and len(o1["order_line"]) == 2  # producto + envío
-    iva = odoo.t["account.tax"][0]
-    assert iva["amount"] == 12 and iva["price_include_override"] == "tax_included"
-    assert all(l[2]["tax_id"] == [(6, 0, [iva["id"]])] for o in odoo.t["sale.order"] for l in o["order_line"])  # IVA 12 % incluido
+    assert "account.tax" not in odoo.t  # pequeño contribuyente: no se crea ningún impuesto
+    assert all(l[2]["tax_id"] == [(6, 0, [])] for o in odoo.t["sale.order"] for l in o["order_line"])  # sin el 15 % por defecto
     o3 = next(o for o in odoo.t["sale.order"] if o["name"] == "GT-0003")
     assert o3["order_line"][0][2]["name"] == "Cozy y Single" and "Revisar:" in o3["note"]
     assert o3["order_line"][0][2]["product_id"] == odoo_sku(odoo, "GT-OTROS")
     c2 = import_sales.Cargador(odoo, aplicar=True).correr(pedidos)
-    assert c2["pedidos"] == 0 and c2["omitidos"] == 6 and len(odoo.t["sale.order"]) == 6 and len(odoo.t["account.tax"]) == 1
+    assert c2["pedidos"] == 0 and c2["omitidos"] == 6 and len(odoo.t["sale.order"]) == 6 and len(odoo.t["product.template"]) == 11
 
 
 def test_moneda_se_corrige_a_gtq_solo_al_aplicar(excel):

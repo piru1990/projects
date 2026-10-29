@@ -1,4 +1,4 @@
-"""Catálogo oficial de Gatherings (precios en quetzales, IVA 12 % incluido).
+"""Catálogo oficial de Gatherings (precios finales en quetzales; régimen de pequeño contribuyente: sin impuesto en las líneas).
 
 `web_id` es el id del producto en gatheringsgt.com (assets/shared.js). `revision=True` marca los productos que Andrea debe
 revisar antes de enviar la cotización (a la medida o con precio por confirmar). No depende de Odoo: se prueba solo.
@@ -23,7 +23,8 @@ PRODUCTOS = [
     {"sku": "GT-BREAK", "web_id": "the-break", "nombre": "The Break", "precio": 0, "minimo": 1, "revision": True},
 ]
 
-IVA = {"nombre": "IVA 12% (incluido)", "porcentaje": 12}
+# Impuesto que Odoo usó hasta el 2026-10-29 (precios con IVA 12 % incluido). `scripts/regimen_5.py` lo quita de las líneas y lo archiva.
+IMPUESTO_ANTERIOR = "IVA 12% (incluido)"
 VALIDEZ_DIAS = 7
 ENVIO_NOTA = "Envío a domicilio: Q35–Q45 según la zona; se confirma aparte."
 HORARIOS = ("Durante la mañana", "Durante la tarde")

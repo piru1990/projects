@@ -213,10 +213,6 @@ class Cargador:
                 self.rpc.create("product.category", {"name": nombre}) if self.aplicar else None)
         return self.categorias[nombre]
 
-    def _iva(self):
-        ids = self.rpc.search("account.tax", [("name", "=", self.cat.IVA["nombre"]), ("type_tax_use", "=", "sale")], limit=1)
-        return ids[0] if ids else None
-
     def componente(self, c: Componente) -> int | None:
         etiqueta = {"alimento": "Materias primas", "empaque": "Empaque y envío", "mano_obra": "Mano de obra"}[c.tipo]
         vals = {"name": c.nombre, "default_code": c.codigo, "type": "consu", "sale_ok": False, "purchase_ok": True,
@@ -252,9 +248,7 @@ class Cargador:
         campos = self.rpc.call("product.template", "fields_get", [], attributes=["type"])
         vals = {"name": oficial["nombre"], "default_code": sku, "list_price": oficial["precio"], "type": "consu",
                 "sale_ok": True, "purchase_ok": False, "is_storable": True}
-        iva = self._iva()
-        if iva:
-            vals["taxes_id"] = [(6, 0, [iva])]
+        vals["taxes_id"] = [(6, 0, [])]   # pequeño contribuyente: sin impuesto en las líneas
         if "gt_web_id" in campos:
             vals.update(gt_web_id=oficial["web_id"], gt_min_qty=oficial["minimo"], gt_unit_label=oficial.get("unidad", ""),
                         gt_quote_mode="review" if oficial.get("revision") else "fixed")

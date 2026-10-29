@@ -1,5 +1,5 @@
 {
-  "_nota": "Catálogo. Los sku GT-SINGLE..GT-TAILORED coinciden con los id de PRODUCTS en gatheringsgt/assets/shared.js. Todos los precios INCLUYEN IVA (12 %). Materias primas y costos: pendientes (Excel de Andrea).",
+  "_nota": "Catálogo. Los sku GT-SINGLE..GT-TAILORED coinciden con los id de PRODUCTS en gatheringsgt/assets/shared.js. Los precios son finales: régimen de pequeño contribuyente (5 %), sin impuesto en las líneas. Costos: ver import_costs.py.",
   "productos": [
     {
       "sku": "GT-SINGLE",
@@ -55,10 +55,6 @@
   "historico": {
     "sku": "GT-OTROS",
     "nombre": "Otros productos (histórico)"
-  },
-  "iva": {
-    "nombre": "IVA 12% (incluido)",
-    "porcentaje": 12
   },
   "alias": {
     "cozy box": "GT-COZYBOX",
