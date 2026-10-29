@@ -62,6 +62,7 @@ python3 importer/import_costs.py load  odoo/data/Costos.xlsx           # simula 
 python3 importer/import_costs.py load  odoo/data/Costos.xlsx --apply   # crea (respaldo antes: scripts/backup.sh)
 ```
 - El Excel de costos va en `odoo/data/` (ignorada por git); el repositorio es público y no debe llevar costos ni márgenes.
+- Proveedores: desde Costos-2.xlsx la hoja trae la columna PROVEEDOR (en DOMES y OTHERS sin título; el script la detecta por su posición). Cada proveedor se crea como contacto de empresa y se enlaza a sus componentes (pestaña Compra) con el mismo costo por kg o unidad. «Gatherings» es costo propio y no se crea. Una segunda corrida no duplica.
 - Sube a 4 decimales la precisión «Product Price» (un gramo de queso cuesta Q0.0760).
 - La hoja cobra empaque distinto del costo unitario en varias líneas (tabla de madera por tamaño, papel film, tenedores, stickers); cada costo distinto es un componente propio. Líneas con cantidad 0 pero costo se cuentan solo si así la suma se acerca al COSTO TOTAL de la hoja.
 - Mini Dome, Big Dome y The GOAT: la hoja no suma sus propias líneas (Q2 de diferencia, la base de cartón); se sigue la suma de líneas y el script lo avisa.
