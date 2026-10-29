@@ -54,6 +54,9 @@ Los campos usados son los de Odoo 18 (`type=consu` + `is_storable`). Pruebas: `p
 ## Cotizaciones desde el sitio web
 Addon `addons/gatherings_cotizacion` + `scripts/setup_cotizaciones.sh`: el pedido del sitio se vuelve cotización en Odoo con los precios oficiales y se envía por correo en PDF de marca. Ver `addons/gatherings_cotizacion/README.md`. Los precios del addon (`catalogo.py`) son los oficiales y reemplazan los históricos de `catalog.json` en los productos que comparten SKU; no volver a correr el importador con `--refresh` sin revisar esa diferencia.
 
+## Pedidos históricos de texto libre
+`scripts/pedidos_historicos.py` pasa 9 pedidos que entraron como texto libre (GT-0008, 11, 43, 70, 71, 90, 100, 106, 109) a productos del catálogo; vinos y extras van en una línea «Extras» (o «Descuento») para que cada total quede igual y el texto original se conserva en la descripción. Simula por defecto, `--apply` aplica (respaldo antes: `scripts/backup.sh`); si algún total o la suma cambia, termina con error. Es idempotente.
+
 ## Costos (Costos.xlsx de Andrea)
 `importer/import_costs.py` carga a Odoo las recetas de la hoja de costos (BOARDS, BOXES, DOMES, OTHERS): materias primas (en kg o unidades), componentes de empaque y envío, «Mano de obra (Q)» y una lista de materiales `GT-COSTOS` por producto. El costo del producto queda igual a la suma de líneas y se verifica contra Odoo al terminar.
 ```
