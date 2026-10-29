@@ -48,7 +48,7 @@ const PRODUCTS = [
   {id:"experience", name:"The Experience", desc:"Una experiencia para crear, compartir y disfrutar. Aprende a armar tu propia tabla de charcutería y celebra alrededor de algo delicioso, hecho por ustedes.", price:150, min:5, photo:"fotos/experience/card.jpg", gallery:pics("experience",8),
    incl:["Mínimo 5 unidades de The Single.","Una clase guiada de una hora para aprender a armar una tabla de charcutería, sin costo adicional.","Un momento para crear juntos y disfrutar de sus tablas mientras comparten."],
    info:[], note:"Ideal para cumpleaños, reuniones entre amigos, celebraciones especiales o simplemente para hacer algo diferente."},
-  {id:"the-goat", name:"The GOAT", desc:"Nuestro famoso dip de queso de cabra con frutos secos. Cremoso, irresistible y, para muchos, el mejor de todos los tiempos. 💙", price:null, photo:"fotos/the-goat/card.jpg", gallery:pics("the-goat",1),
+  {id:"the-goat", name:"The GOAT", desc:"Nuestro famoso dip de queso de cabra con frutos secos. Cremoso, irresistible y, para muchos, el mejor de todos los tiempos. 💙", price:65, photo:"fotos/the-goat/card.jpg", gallery:pics("the-goat",1),
    incl:"Dip artesanal de queso de cabra (120 g), cubierto con nueces (30 g) y arándanos (30 g).",
    info:[["Peso neto total","180 g."]]},
   {id:"the-break", name:"The Break", desc:"Una pausa deliciosa para compartir y recargar energías. Meriendas prácticas, ricas y listas para disfrutar, ideales para reuniones, eventos y jornadas de trabajo.", price:null, photo:"fotos/the-break/card.jpg", gallery:pics("the-break",2),

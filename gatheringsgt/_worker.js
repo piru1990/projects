@@ -24,7 +24,7 @@ const PRODUCTS = {
   "glass-dome": {name: "The Glass Dome", price: 75, min: 10, desc: "Una pequeña creación gourmet bajo una elegante cúpula de vidrio."},
   "grazing-table": {name: "The Grazing Table", price: 90, min: 20, unit: "persona", desc: "Una mesa de charcutería diseñada a tu medida, con una selección gourmet para convertir cualquier celebración en un encuentro extraordinario."},
   "experience": {name: "The Experience", price: 150, min: 5, desc: "Una experiencia para crear, compartir y disfrutar. Aprende a armar tu propia tabla de charcutería y celebra alrededor de algo delicioso, hecho por ustedes."},
-  "the-goat": {name: "The GOAT", price: null, desc: "Nuestro famoso dip de queso de cabra con frutos secos. Cremoso, irresistible y, para muchos, el mejor de todos los tiempos. 💙"},
+  "the-goat": {name: "The GOAT", price: 65, desc: "Nuestro famoso dip de queso de cabra con frutos secos. Cremoso, irresistible y, para muchos, el mejor de todos los tiempos. 💙"},
   "the-break": {name: "The Break", price: null, desc: "Una pausa deliciosa para compartir y recargar energías. Meriendas prácticas, ricas y listas para disfrutar, ideales para reuniones, eventos y jornadas de trabajo."}
 };
 

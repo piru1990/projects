@@ -19,6 +19,8 @@ PRODUCTOS = [
      "unidad": "persona", "revision": True},
     # Precio por confirmar con Andrea (2026-10-23): por eso pasa por revisión.
     {"sku": "GT-EXPERIENCE", "web_id": "experience", "nombre": "The Experience", "precio": 150, "minimo": 5, "revision": True},
+    {"sku": "GT-GOAT", "web_id": "the-goat", "nombre": "The GOAT", "precio": 65, "minimo": 1},  # Q65: Allan, 2026-10-29
+    {"sku": "GT-BREAK", "web_id": "the-break", "nombre": "The Break", "precio": 0, "minimo": 1, "revision": True},
 ]
 
 IVA = {"nombre": "IVA 12% (incluido)", "porcentaje": 12}
