@@ -157,7 +157,7 @@ class SaleOrder(models.Model):
             if datos["telefono"] and not partner.phone:
                 partner.phone = datos["telefono"]
             return partner
-        return Partner.create({
+        return Partner.with_context(mail_create_nosubscribe=True).create({
             "name": datos["nombre"], "email": datos["correo"], "phone": datos["telefono"] or False,
             "comment": "Creado desde el sitio web.",
         })

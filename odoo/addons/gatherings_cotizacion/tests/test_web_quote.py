@@ -191,3 +191,4 @@ class TestWebQuote(TransactionCase):
         self.assertIn(orden.partner_id, orden.message_partner_ids)
         lead = self.env["crm.lead"].search([("name", "ilike", orden.name)])
         self.assertNotIn(usuario.partner_id, lead.message_partner_ids)
+        self.assertNotIn(usuario.partner_id, orden.partner_id.message_partner_ids)
