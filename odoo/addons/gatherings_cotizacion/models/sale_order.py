@@ -109,7 +109,9 @@ class SaleOrder(models.Model):
             motivos.append("Muchas solicitudes seguidas del sitio web: no se envió nada al cliente, revisa que sea legítima.")
         lineas = [(0, 0, {"product_id": prod.product_variant_id.id, "product_uom_qty": qty}) for prod, qty in datos["lineas"]]
         lineas.append((0, 0, {"display_type": "line_note", "name": catalogo.ENVIO_NOTA}))
-        orden = self.create({
+        # mail_create_nosubscribe: el usuario técnico del sitio no tiene correo; como seguidor, cada mensaje del chatter
+        # le intentaría enviar un correo y fallaría («Invalid email address»).
+        orden = self.with_context(mail_create_nosubscribe=True).create({
             "partner_id": partner.id,
             "origin": "Sitio web",
             "validity_date": fields.Date.context_today(self) + timedelta(days=catalogo.VALIDEZ_DIAS),
@@ -173,7 +175,7 @@ class SaleOrder(models.Model):
     def _gt_lead(self, orden, datos):
         if "crm.lead" not in self.env:
             return
-        lead = self.env["crm.lead"].create({
+        lead = self.env["crm.lead"].with_context(mail_create_nosubscribe=True).create({
             "name": f"Cotización web {orden.name}",
             "partner_id": orden.partner_id.id,
             "email_from": datos["correo"],

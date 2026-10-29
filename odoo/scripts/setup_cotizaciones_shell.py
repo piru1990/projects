@@ -10,13 +10,22 @@ if "crm.lead" in env:
 grupos = [env.ref(g).id for g in GRUPOS]
 usuario = env["res.users"].with_context(active_test=False).search([("login", "=", LOGIN)], limit=1)
 vals = {"name": "Web Cotizaciones", "login": LOGIN, "active": True, "groups_id": [(6, 0, grupos)],
-        "notification_type": "email"}
+        "notification_type": "inbox"}   # sin correo propio: que nunca intenten escribirle por correo
 if usuario:
     usuario.write(vals)
     print(f"Usuario {LOGIN} actualizado (id {usuario.id}).")
 else:
     usuario = env["res.users"].with_context(no_reset_password=True).create(vals)
     print(f"Usuario {LOGIN} creado (id {usuario.id}).")
+
+# El usuario técnico no tiene correo: como seguidor, los mensajes del chatter fallan con «Invalid email address».
+# Se le quita de las cotizaciones y leads que ya lo tenían como seguidor (idempotente).
+for modelo in ("sale.order", "crm.lead"):
+    if modelo in env:
+        seguidores = env["mail.followers"].sudo().search(
+            [("res_model", "=", modelo), ("partner_id", "=", usuario.partner_id.id)])
+        print(f"Seguidores del usuario técnico quitados en {modelo}: {len(seguidores)}")
+        seguidores.unlink()
 
 if os.environ.get("GT_NUEVA_LLAVE") == "1" or not env["res.users.apikeys"].sudo().search([("user_id", "=", usuario.id)]):
     # Sin vencimiento (Odoo limita a 90 días a los usuarios internos): usuario con permisos mínimos; para rotarla, volver a
