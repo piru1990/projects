@@ -189,6 +189,7 @@ class Cargador:
         self.cat = _catalogo()
         self.uom: dict[str, int] = {}
         self.categorias: dict[str, int] = {}
+        self.faltan: set[str] = set()   # productos del catálogo que no existen (para no contarlos dos veces al simular)
         self.contador = {"componentes": 0, "actualizados": 0, "productos": 0, "listas": 0, "costos": 0}
 
     def _uoms(self):
@@ -235,17 +236,21 @@ class Cargador:
             tmpl = self.rpc.create("product.template", vals)
         return self.rpc.search("product.product", [("product_tmpl_id", "=", tmpl)], limit=1)[0]
 
-    def producto_final(self, r: Receta) -> int | None:
-        """Plantilla del producto terminado; crea los que faltan del catálogo oficial (por ejemplo The GOAT)."""
-        oficial = next((p for p in self.cat.PRODUCTOS if p["sku"] == r.sku), None)
-        ids = self.rpc.search("product.template", [("default_code", "=", r.sku)], limit=1)
+    def producto_final(self, sku: str) -> int | None:
+        """Plantilla de un producto del catálogo oficial; lo crea si falta (por ejemplo The GOAT o The Break: el addon
+        solo crea los productos al instalarse, y el sitio no puede cotizar un producto que Odoo no tiene)."""
+        oficial = next(p for p in self.cat.PRODUCTOS if p["sku"] == sku)
+        ids = self.rpc.search("product.template", [("default_code", "=", sku)], limit=1)
         if ids:
             return ids[0]
+        if sku in self.faltan:
+            return None
+        self.faltan.add(sku)
         self.contador["productos"] += 1
         if not self.aplicar:
             return None
         campos = self.rpc.call("product.template", "fields_get", [], attributes=["type"])
-        vals = {"name": oficial["nombre"], "default_code": r.sku, "list_price": oficial["precio"], "type": "consu",
+        vals = {"name": oficial["nombre"], "default_code": sku, "list_price": oficial["precio"], "type": "consu",
                 "sale_ok": True, "purchase_ok": False, "is_storable": True}
         iva = self._iva()
         if iva:
@@ -263,11 +268,13 @@ class Cargador:
             for c, _, _ in r.lineas:
                 if c.codigo not in comp_ids:
                     comp_ids[c.codigo] = self.componente(c)
+        for p in self.cat.PRODUCTOS:     # todo el catálogo del sitio debe existir en Odoo, tenga o no receta
+            self.producto_final(p["sku"])
         for r in recetas:
             if not r.sku:
                 print(f"  ⚠ {r.nombre}: sin SKU en el catálogo, se omite")
                 continue
-            tmpl = self.producto_final(r)
+            tmpl = self.producto_final(r.sku)
             if tmpl is None:        # simulación de un producto aún no creado
                 self.contador["listas"] += 1
                 continue

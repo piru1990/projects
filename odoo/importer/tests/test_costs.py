@@ -111,6 +111,7 @@ def test_carga_dry_run_no_escribe(excel):
     antes = {k: len(v) for k, v in odoo.t.items()}
     c = import_costs.Cargador(odoo, aplicar=False).correr(import_costs.leer_recetas(excel))
     assert {k: len(v) for k, v in odoo.t.items()} == antes and c["componentes"] > 0
+    assert c["productos"] == len(import_costs._catalogo().PRODUCTOS) - 1   # todo el catálogo menos GT-SINGLE, que ya existe
 
 
 def test_carga_real_idempotente_y_costo_igual_a_la_hoja(excel):
@@ -123,6 +124,8 @@ def test_carga_real_idempotente_y_costo_igual_a_la_hoja(excel):
     assert single["standard_price"] == pytest.approx(30.72)
     goat = next(t for t in odoo.t["product.template"] if t["default_code"] == "GT-GOAT")  # creado desde el catálogo
     assert goat["list_price"] == 65 and goat["gt_web_id"] == "the-goat" and goat["gt_quote_mode"] == "fixed"
+    brk = next(t for t in odoo.t["product.template"] if t["default_code"] == "GT-BREAK")  # sin receta, pero el sitio lo vende
+    assert brk["gt_quote_mode"] == "review" and brk["gt_web_id"] == "the-break"
     assert c.verificar(recetas) == []
     n_comp, n_bom = len(odoo.t["product.template"]), len(odoo.t["mrp.bom"])
     import_costs.Cargador(odoo, aplicar=True).correr(recetas)
