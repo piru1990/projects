@@ -54,6 +54,20 @@ Los campos usados son los de Odoo 18 (`type=consu` + `is_storable`). Pruebas: `p
 ## Cotizaciones desde el sitio web
 Addon `addons/gatherings_cotizacion` + `scripts/setup_cotizaciones.sh`: el pedido del sitio se vuelve cotización en Odoo con los precios oficiales y se envía por correo en PDF de marca. Ver `addons/gatherings_cotizacion/README.md`. Los precios del addon (`catalogo.py`) son los oficiales y reemplazan los históricos de `catalog.json` en los productos que comparten SKU; no volver a correr el importador con `--refresh` sin revisar esa diferencia.
 
+## Costos (Costos.xlsx de Andrea)
+`importer/import_costs.py` carga a Odoo las recetas de la hoja de costos (BOARDS, BOXES, DOMES, OTHERS): materias primas (en kg o unidades), componentes de empaque y envío, «Mano de obra (Q)» y una lista de materiales `GT-COSTOS` por producto. El costo del producto queda igual a la suma de líneas y se verifica contra Odoo al terminar.
+```
+python3 importer/import_costs.py check odoo/data/Costos.xlsx           # lee y reporta, sin Odoo
+python3 importer/import_costs.py load  odoo/data/Costos.xlsx           # simula contra Odoo
+python3 importer/import_costs.py load  odoo/data/Costos.xlsx --apply   # crea (respaldo antes: scripts/backup.sh)
+```
+- El Excel de costos va en `odoo/data/` (ignorada por git); el repositorio es público y no debe llevar costos ni márgenes.
+- Sube a 4 decimales la precisión «Product Price» (un gramo de queso cuesta Q0.0760).
+- La hoja cobra empaque distinto del costo unitario en varias líneas (tabla de madera por tamaño, papel film, tenedores, stickers); cada costo distinto es un componente propio. Líneas con cantidad 0 pero costo se cuentan solo si así la suma se acerca al COSTO TOTAL de la hoja.
+- Mini Dome, Big Dome y The GOAT: la hoja no suma sus propias líneas (Q2 de diferencia, la base de cartón); se sigue la suma de líneas y el script lo avisa.
+- Probado contra un Odoo 18 limpio con `gatherings_cotizacion`: costos iguales a la hoja y al botón «Calcular precio desde la lista de materiales» de Odoo; una segunda corrida no duplica.
+- The GOAT se publica a Q65 (sitio, Worker y `catalogo.py`).
+
 ## Falta (siguientes pasos)
-- Materias primas, proveedores y costos: llegan en el Excel de Andrea (importador análogo + listas de materiales).
+- Proveedores: la hoja de costos no trae nombres.
 - Parte C: formularios de captura para Andrea/el personal, y subdominios por producto (SKU).

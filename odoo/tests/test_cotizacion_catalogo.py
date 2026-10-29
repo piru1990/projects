@@ -22,7 +22,7 @@ def _sitio():
 
 def test_sitio_y_catalogo_coinciden():
     sitio = _sitio()
-    assert len(sitio) == 12
+    assert len(sitio) == 14
     oficial = {p["web_id"]: (p["precio"] or None, p["minimo"], p.get("unidad", "")) for p in catalogo.PRODUCTOS}
     assert oficial == sitio
 
