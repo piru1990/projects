@@ -39,3 +39,10 @@ def test_worker_y_catalogo_coinciden():
 def test_skus_y_ids_unicos():
     assert len({p["sku"] for p in catalogo.PRODUCTOS}) == len(catalogo.PRODUCTOS)
     assert len({p["web_id"] for p in catalogo.PRODUCTOS}) == len(catalogo.PRODUCTOS)
+
+
+def test_sitio_avisa_los_productos_que_van_a_revision():
+    """El aviso del carrito (rev:true en shared.js) debe coincidir con «Requiere revisión» del catálogo de Odoo."""
+    texto = (RAIZ / "gatheringsgt" / "assets" / "shared.js").read_text(encoding="utf-8")
+    sitio = set(re.findall(r'\{id:"([a-z-]+)",[^\n]*?rev:true,', texto))
+    assert sitio == {p["web_id"] for p in catalogo.PRODUCTOS if p.get("revision")}

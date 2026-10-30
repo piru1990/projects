@@ -7,6 +7,7 @@ const CURRENCY = "Q";
 const API_COTIZAR = "/api/cotizar";   // POST: Odoo crea la cotización y se la envía al cliente (ver _worker.js)
 const TURNSTILE_KEY = "0x4AAAAAAFi5dZKAr9CTywNw";   // clave pública del widget Cloudflare Turnstile; vacío = sin verificación (el Worker la exige si tiene TURNSTILE_SECRET)
 /* price: número en quetzales (precio final), o null para "Cotizar". min: pedido mínimo de unidades (opcional).
+   rev: true = se cotiza a la medida o con precio por confirmar: la cotización pasa por revisión y no sale sola (debe coincidir con «Requiere revisión» en Odoo).
    photo: foto de la tarjeta, ruta desde la raíz del sitio; vacío = recuadro «Foto próximamente».
    gallery: fotos del detalle (la primera es la principal).  incl: «Qué incluye» (texto, o lista de viñetas; vacío = se confirma por WhatsApp).
    info: líneas «Tamaño», «Porciones» o «Presentación» ([[etiqueta, valor], ...]).  unit: unidad del precio si no es «c/u» (ej. "persona").  note: texto final del detalle. */
@@ -24,7 +25,7 @@ const PRODUCTS = [
   {id:"gathering", name:"The Gathering", desc:"Abundante, artesanal y pensada para hacer extraordinarios los encuentros especiales.", price:800, photo:"fotos/gathering/card.jpg", gallery:pics("gathering",5),
    incl:"Uvas verdes sin semilla, fresas frescas, quesos cheddar, suizo y pepper jack, dip de queso de cabra con frutos secos, salami imperial, salami español, jamón serrano, miel, aceitunas, galletas multigrano, mini pretzels, pan, dátiles y almendras cubiertas de chocolate.",
    info:[["Tamaño","30 × 70 cm"],["Porciones","7–10 personas"]]},
-  {id:"tailored", name:"The Tailored", desc:"Una creación a tu medida, diseñada según tus gustos, tu ocasión y tu estilo.", price:null, photo:"fotos/tailored/card.jpg", gallery:pics("tailored",5),
+  {id:"tailored", name:"The Tailored", desc:"Una creación a tu medida, diseñada según tus gustos, tu ocasión y tu estilo.", rev:true, price:null, photo:"fotos/tailored/card.jpg", gallery:pics("tailored",5),
    incl:"Una selección personalizada de quesos, charcutería, frutas frescas y acompañamientos gourmet, definida según tus preferencias, la ocasión y tu presupuesto. Cada creación se diseña a tu medida.",
    info:[]},
   {id:"little-box", name:"The Little Box", desc:"Pequeño detalle gourmet, cuidadosamente presentado y listo para disfrutar.", price:65, min:5, photo:"fotos/little-box/card.jpg", gallery:pics("little-box",2),
@@ -42,16 +43,16 @@ const PRODUCTS = [
   {id:"glass-dome", name:"The Glass Dome", desc:"Una pequeña creación gourmet bajo una elegante cúpula de vidrio.", price:75, min:10, photo:"fotos/glass-dome/card.jpg", gallery:pics("glass-dome",2),
    incl:"Una flor de salami español, uvas verdes sin semilla, fresa fresca, queso cheddar y galletas multigrano.",
    info:[["Presentación","elegante domo de vidrio."]]},
-  {id:"grazing-table", name:"The Grazing Table", desc:"Una mesa de charcutería diseñada a tu medida, con una selección gourmet para convertir cualquier celebración en un encuentro extraordinario.", price:90, min:20, unit:"persona", photo:"fotos/grazing-table/card.jpg", gallery:pics("grazing-table",6),
+  {id:"grazing-table", name:"The Grazing Table", desc:"Una mesa de charcutería diseñada a tu medida, con una selección gourmet para convertir cualquier celebración en un encuentro extraordinario.", rev:true, price:90, min:20, unit:"persona", photo:"fotos/grazing-table/card.jpg", gallery:pics("grazing-table",6),
    incl:["Mesa de charcutería con quesos, charcutería premium, frutas frescas y acompañamientos gourmet.","Selecciones y adicionales personalizados según tus preferencias y el estilo de tu evento.","Montaje y desmontaje de la mesa."],
    info:[]},
-  {id:"experience", name:"The Experience", desc:"Una experiencia para crear, compartir y disfrutar. Aprende a armar tu propia tabla de charcutería y celebra alrededor de algo delicioso, hecho por ustedes.", price:150, min:5, photo:"fotos/experience/card.jpg", gallery:pics("experience",8),
+  {id:"experience", name:"The Experience", desc:"Una experiencia para crear, compartir y disfrutar. Aprende a armar tu propia tabla de charcutería y celebra alrededor de algo delicioso, hecho por ustedes.", rev:true, price:150, min:5, photo:"fotos/experience/card.jpg", gallery:pics("experience",8),
    incl:["Mínimo 5 unidades de The Single.","Una clase guiada de una hora para aprender a armar una tabla de charcutería, sin costo adicional.","Un momento para crear juntos y disfrutar de sus tablas mientras comparten."],
    info:[], note:"Ideal para cumpleaños, reuniones entre amigos, celebraciones especiales o simplemente para hacer algo diferente."},
   {id:"the-goat", name:"The GOAT", desc:"Nuestro famoso dip de queso de cabra con frutos secos. Cremoso, irresistible y, para muchos, el mejor de todos los tiempos. 💙", price:65, photo:"fotos/the-goat/card.jpg", gallery:pics("the-goat",1),
    incl:"Dip artesanal de queso de cabra (120 g), cubierto con nueces (30 g) y arándanos (30 g).",
    info:[["Peso neto total","180 g."]]},
-  {id:"the-break", name:"The Break", desc:"Una pausa deliciosa para compartir y recargar energías. Meriendas prácticas, ricas y listas para disfrutar, ideales para reuniones, eventos y jornadas de trabajo.", price:null, photo:"fotos/the-break/card.jpg", gallery:pics("the-break",2),
+  {id:"the-break", name:"The Break", desc:"Una pausa deliciosa para compartir y recargar energías. Meriendas prácticas, ricas y listas para disfrutar, ideales para reuniones, eventos y jornadas de trabajo.", rev:true, price:null, photo:"fotos/the-break/card.jpg", gallery:pics("the-break",2),
    incl:["Un panini preparado y listo para disfrutar.","Una selección de snacks para acompañar.","Una bebida.","Presentación individual, práctica y lista para entregar."],
    info:[["Precio","personalizado según la selección, la cantidad de meriendas y las necesidades de cada empresa."]]}
 ];
@@ -157,6 +158,11 @@ function closeDetail(fromPop){
 
 function lines(){ return PRODUCTS.filter(p => cart[p.id]).map(p => ({p, n: cart[p.id]})); }
 
+/* Productos del pedido que Andrea cotiza a mano: el pedido completo pasa por revisión y la cotización llega después. */
+const revNames = L => L.filter(x => x.p.rev).map(x => x.p.name);
+const revList = ns => ns.length > 1 ? ns.slice(0, -1).join(", ") + " y " + ns[ns.length - 1] : ns[0];
+const revMsg = ns => `Tu pedido incluye ${revList(ns)}, que ${ns.length > 1 ? "se cotizan" : "se cotiza"} a la medida o con precio por confirmar. Te enviaremos la cotización completa por correo después de revisarla, no al instante.`;
+
 function render(){
   const L = lines(), n = L.reduce((a,x) => a + (x.p.unit ? 1 : x.n), 0);   /* por persona = 1 producto */
   const known = L.length && L.every(x => x.p.price), tot = L.reduce((a,x) => a + (x.p.price||0) * x.n, 0);
@@ -165,6 +171,8 @@ function render(){
   $("#cartTxt").textContent = n + (n === 1 ? " producto" : " productos") + (known && tot ? " · " + money(tot) : "");
   $("#sum").innerHTML = n ? L.map(x => `${x.p.unit ? unitsTxt(x.p, x.n) : x.n} × ${esc(x.p.name)}`).join("<br>") : "Aún no has agregado nada. También puedes escribirnos directo para cotizar un evento.";
   $("#saveBox").hidden = !n;
+  const rn = $("#revNote"), rv = revNames(L);
+  if (rn){ rn.hidden = !rv.length; rn.textContent = rv.length ? revMsg(rv) : ""; }
 }
 
 function change(id, d){
@@ -219,6 +227,7 @@ async function quote(f, L){
   ["nombre","correo","telefono","fecha","horario","dir","mensaje","notas"].forEach(k => { body[k] = (f.get(k) || "").trim(); });
   btns.forEach(b => { b.disabled = true; });
   say("Preparando tu cotización…");
+  const rv = revNames(L);
   const alWa = () => say("No pudimos generar la cotización automática en este momento.", "err", wa(waText(f, L)));
   try {
     const r = await fetch(API_COTIZAR, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(body)});
@@ -226,7 +235,7 @@ async function quote(f, L){
     if (j.ok){
       say(j.estado === "enviada"
         ? `¡Listo! Te enviamos la cotización a ${correo}. Si no la ves, revisa tu carpeta de spam o promociones.`
-        : `Recibimos tu solicitud. Te enviaremos la cotización a ${correo} en breve.`, "");
+        : `Recibimos tu solicitud.${rv.length ? ` ${revList(rv)} ${rv.length > 1 ? "requieren" : "requiere"} revisión: ` : " "}Te enviaremos la cotización completa a ${correo} en breve.`, "");
       Object.keys(cart).forEach(k => delete cart[k]); store.set(CART_KEY, cart); render();
     } else if (j.fallback || !r.ok && !j.error) alWa();
     else say(j.error || "Revisa los datos de tu pedido.", "err");
