@@ -65,6 +65,8 @@
       <tr><td style="padding:28px;font-size:16px;line-height:1.5;color:#031666;">
         <p style="margin:0 0 14px 0;font-family:Georgia,serif;font-size:22px;letter-spacing:1px;text-transform:uppercase;">Recibimos tu solicitud</p>
         <p style="margin:0 0 14px 0;">Hola <t t-out="object.partner_id.name or ''">Cliente</t>, gracias por escribirnos. Recibimos tu pedido <strong><t t-out="object.name"/></strong> y lo estamos preparando a tu medida.</p>
+        <t t-set="a_medida" t-value="object.order_line.filtered(lambda l: l.product_id and l.product_id.product_tmpl_id.gt_quote_mode == 'review')"/>
+        <p t-if="a_medida" style="margin:0 0 14px 0;">Tu pedido incluye <strong><t t-out="', '.join(a_medida.mapped('product_id.name'))"/></strong>, que se cotiza a la medida o con precio por confirmar. Por eso no te enviamos la cotización al instante: la preparamos con cuidado y te la mandamos completa.</p>
         <p style="margin:0 0 14px 0;">Nuestro equipo revisa los detalles y te enviará tu cotización por este mismo medio en breve. Si necesitas algo antes, escríbenos por WhatsApp.</p>
       </td></tr>
       <tr><td align="center" style="padding:0 28px 28px 28px;">

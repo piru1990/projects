@@ -37,7 +37,7 @@ a{color:inherit}
 html{scroll-behavior:smooth}#menu,#pedido{scroll-margin-top:64px}
 .eyebrow{display:block;height:34px;width:auto;margin:0 0 6px}
 .btn{display:inline-block;border:0;border-radius:999px;padding:12px 22px;font:700 15px var(--sans);text-decoration:none;cursor:pointer}
-.btn-wa{background:var(--wa);color:var(--navy)}.btn-quote{background:var(--navy);color:#fff}.btn[disabled]{opacity:.6;cursor:wait}.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.qmsg{font:600 14px var(--sans);text-align:center;margin:0;min-height:1.2em;color:var(--navy)}.qmsg.err{color:#b3261e}.qmsg a{color:var(--navy)}
+.btn-wa{background:var(--wa);color:var(--navy)}.btn-quote{background:var(--navy);color:#fff}.btn[disabled]{opacity:.6;cursor:wait}.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.qmsg{font:600 14px var(--sans);text-align:center;margin:0;min-height:1.2em;color:var(--navy)}.revnote{background:#AFDCBF;padding:10px 12px;border-radius:8px;margin-bottom:8px}.revnote[hidden]{display:none}.qmsg.err{color:#b3261e}.qmsg a{color:var(--navy)}
 
 .wai{width:1.2em;height:1.2em;flex:none}.btn-ico{display:inline-flex;align-items:center;justify-content:center;gap:8px}footer a.tel{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}footer a.tel .wai{width:18px;height:18px}footer a.tel{transition:color .15s,transform .15s}footer a.tel:hover,footer a.tel:focus-visible{color:var(--green);transform:translateY(-2px)}
 .hero{background:var(--navy);color:#fff;text-align:center;padding:34px 24px 38px}
@@ -111,6 +111,7 @@ footer .social{flex-wrap:wrap;row-gap:10px;gap:16px}
       <div id="ts"></div>
       <button class="btn btn-quote" type="submit" data-via="quote">Recibir cotización por correo</button>
       <button class="btn btn-wa btn-ico" type="submit" data-via="wa" aria-label="Finalizar pedido">Finalizar pedido <svg class="wai" aria-hidden="true"><use href="#wa"/></svg></button>
+      <p class="qmsg revnote" id="revNote" role="note" hidden></p>
       <p class="qmsg" id="qmsg" role="status" aria-live="polite"></p>
       <p class="note">No se cobra nada en la página: el envío y el pago se acuerdan por chat.</p>
     </form>

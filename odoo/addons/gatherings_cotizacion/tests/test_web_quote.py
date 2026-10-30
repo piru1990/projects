@@ -66,6 +66,19 @@ class TestWebQuote(TransactionCase):
         self.assertEqual(len(self.mensajes(orden)), 1)
         self.assertIn("Pedido recibido", self.mensajes(orden).body)
 
+    def test_acuse_dice_que_productos_requieren_revision(self):
+        r = self.Order.gt_web_quote(self.pedido([{"id": "glass-dome", "qty": 10}, {"id": "the-break", "qty": 1}]))
+        self.assertEqual(r["estado"], "revision")
+        orden = self.Order.search([("name", "=", r["cotizacion"])])
+        cuerpo = self.env.ref("gatherings_cotizacion.mail_template_recibida")._render_field("body_html", orden.ids)[orden.id]
+        self.assertIn("The Break", cuerpo)
+        self.assertNotIn("The Glass Dome", cuerpo)
+        # sin productos a la medida (p. ej. mínimo no cumplido) el acuse no inventa un motivo
+        r2 = self.Order.gt_web_quote(self.pedido([{"id": "mini-dome", "qty": 3}]))
+        orden2 = self.Order.search([("name", "=", r2["cotizacion"])])
+        cuerpo2 = self.env.ref("gatherings_cotizacion.mail_template_recibida")._render_field("body_html", orden2.ids)[orden2.id]
+        self.assertNotIn("se cotiza a la medida", cuerpo2)
+
     def test_menos_del_minimo_queda_en_revision(self):
         r = self.Order.gt_web_quote(self.pedido([{"id": "mini-dome", "qty": 3}]))
         self.assertEqual(r["estado"], "revision")
